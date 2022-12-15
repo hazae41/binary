@@ -1,5 +1,5 @@
 <div align="center">
-<img width="500" src="https://user-images.githubusercontent.com/4405263/207935460-d3462bb8-886d-449d-84c9-3d7eaedbc87f.png" />
+<img width="500" src="https://user-images.githubusercontent.com/4405263/207937118-2a3e47f4-c291-4186-a1bc-69a9638fedd3.png" />
 <h3 align="center">Zero-copy Buffer reader and writer 🏎️</h3>
 </div>
 
