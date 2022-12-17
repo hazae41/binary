@@ -1,7 +1,9 @@
 <div align="center">
 <img width="500" src="https://user-images.githubusercontent.com/4405263/207937118-2a3e47f4-c291-4186-a1bc-69a9638fedd3.png" />
-<h3 align="center">Zero-copy Buffer reader and writer 🏎️</h3>
 </div>
+<h3 align="center">
+Zero-copy Buffer reader and writer 🏎️
+</h3>
 
 ```bash
 npm i @hazae41/binary
