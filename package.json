@@ -1,8 +1,10 @@
 {
   "type": "module",
   "name": "@hazae41/binary",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Zero-copy Buffer reader and writer",
+  "homepage": "https://github.com/hazae41/binary",
+  "repository": "github:hazae41/binary",
   "author": "hazae41",
   "license": "MIT",
   "main": "./dist/cjs/index.cjs",
