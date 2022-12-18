@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@hazae41/binary",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Zero-copy Buffer reader and writer",
   "author": "hazae41",
   "license": "MIT",
@@ -9,6 +9,11 @@
   "module": "./dist/esm/index.mjs",
   "types": "./dist/types/index.d.ts",
   "sideEffects": false,
+  "files": [
+    "./dist/esm",
+    "./dist/cjs",
+    "./dist/types"
+  ],
   "scripts": {
     "build": "rimraf dist && rollup -c",
     "test": "node ./dist/test/index.test.cjs",
@@ -38,5 +43,30 @@
       "require": "./dist/cjs/index.cjs"
     }
   },
-  "files": ["/dist"]
+  "keywords": [
+    "binary",
+    "zero-copy",
+    "encoding",
+    "decoding",
+    "buffer",
+    "bytes",
+    "protocol",
+    "packets",
+    "reader",
+    "writer",
+    "offset",
+    "asn1",
+    "der",
+    "ber",
+    "octets",
+    "stream",
+    "low-level",
+    "alloc",
+    "allocation",
+    "allocator",
+    "typescript",
+    "esmodules",
+    "tested",
+    "unit-tested"
+  ]
 }
