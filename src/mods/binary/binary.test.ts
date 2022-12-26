@@ -1,13 +1,10 @@
-import { assert, throws } from "libs/assert/assert.js";
+import { assert, test, throws } from "@hazae41/phobos";
 import { Binary } from "mods/binary/binary.js";
 import { relative, resolve } from "node:path";
-import { test } from "uvu";
 
-test.before(async () => {
-  const directory = resolve("./dist/test/")
-  const { pathname } = new URL(import.meta.url)
-  console.log(relative(directory, pathname))
-})
+const directory = resolve("./dist/test/")
+const { pathname } = new URL(import.meta.url)
+console.log(relative(directory, pathname.replace(".cjs", ".ts")))
 
 test("Allocation", async () => {
   for (let i = 0; i < 32; i++) {
@@ -142,5 +139,3 @@ test("writeUint32 then readUint32", async () => {
   assert(throws(() => binary.writeUint16(2 ** 32)))
   assert(throws(() => binary.writeUint16(-1)))
 })
-
-test.run()
