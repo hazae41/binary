@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@hazae41/binary",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Zero-copy Buffer reader and writer",
   "homepage": "https://github.com/hazae41/binary",
   "repository": "github:hazae41/binary",
@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "build": "rimraf dist && rollup -c",
-    "test": "node ./dist/test/index.test.cjs",
+    "test": "node ./dist/test/src/index.test.cjs",
     "prepare": "npm run build"
   },
   "dependencies": {
