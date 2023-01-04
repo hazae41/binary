@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@hazae41/binary",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Zero-copy Buffer reader and writer",
   "homepage": "https://github.com/hazae41/binary",
   "repository": "github:hazae41/binary",
@@ -21,6 +21,9 @@
     "test": "node ./dist/test/index.test.cjs",
     "prepare": "npm run build"
   },
+  "dependencies": {
+    "tslib": "^2.4.1"
+  },
   "devDependencies": {
     "@hazae41/phobos": "^1.0.5",
     "@rollup/plugin-commonjs": "^23.0.2",
@@ -30,10 +33,10 @@
     "@types/jest": "^29.2.3",
     "@types/node": "^18.11.9",
     "rimraf": "^3.0.2",
-    "rollup": "^3.2.5",
+    "rollup": "^3.9.1",
     "rollup-plugin-dts": "^5.0.0",
+    "rollup-plugin-node-externals": "^5.0.3",
     "ts-node": "^10.9.1",
-    "tslib": "^2.4.1",
     "ttypescript": "^1.5.13",
     "typescript": "^4.8.4",
     "typescript-transform-paths": "^3.4.4"
