@@ -233,6 +233,41 @@ export class Binary {
   }
 
   /**
+   * Get a 64-bits unsigned number
+   * @returns 64-bits unsigned number
+   */
+  getUint64() {
+    return this.buffer.readBigUInt64BE(this.offset)
+  }
+
+  /**
+   * Read a 64-bits unsigned number
+   * @returns 64-bits unsigned number
+   */
+  readUint64() {
+    const x = this.getUint64()
+    this.offset += 8
+    return x
+  }
+
+  /**
+   * Set a 64-bits unsigned number
+   * @param x 64-bits unsigned number
+   */
+  setUint64(x: bigint) {
+    this.buffer.writeBigUInt64BE(x, this.offset)
+  }
+
+  /**
+   * Write a 64-bits unsigned number
+   * @param x 64-bits unsigned number
+   */
+  writeUint64(x: bigint) {
+    this.setUint64(x)
+    this.offset += 8
+  }
+
+  /**
    * Get a fixed-length string
    * @param length byte length of the string
    * @param encoding encoding
