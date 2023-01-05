@@ -1,7 +1,7 @@
 export class Binary {
-  readonly #class = Binary
-
   offset = 0
+
+  readonly view: DataView
 
   /**
    * An object with a Buffer and an offset
@@ -9,7 +9,9 @@ export class Binary {
    */
   constructor(
     public buffer: Buffer
-  ) { }
+  ) {
+    this.view = new DataView(this.buffer.buffer)
+  }
 
   /**
    * Create a new Binary using Buffer.alloc
@@ -237,7 +239,7 @@ export class Binary {
    * @returns 64-bits unsigned number
    */
   getUint64() {
-    return this.buffer.readBigUInt64BE(this.offset)
+    return this.view.getBigUint64(this.offset)
   }
 
   /**
@@ -255,7 +257,7 @@ export class Binary {
    * @param x 64-bits unsigned number
    */
   setUint64(x: bigint) {
-    this.buffer.writeBigUInt64BE(x, this.offset)
+    this.view.setBigUint64(this.offset, x)
   }
 
   /**
