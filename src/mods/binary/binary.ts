@@ -1,16 +1,22 @@
-export class Binary {
+import { Buffers } from "libs/buffers/buffers.js"
+
+export class Binary<T extends Uint8Array> {
   offset = 0
 
-  readonly view: DataView
+  readonly data: DataView
 
   /**
    * An object with a Buffer and an offset
-   * @param buffer Buffer
+   * @param bytes Buffer
    */
   constructor(
-    public buffer: Buffer
+    public bytes: T
   ) {
-    this.view = new DataView(this.buffer.buffer)
+    this.data = new DataView(this.bytes.buffer, this.bytes.byteOffset, this.bytes.byteLength)
+  }
+
+  get buffer() {
+    return Buffers.fromView(this.bytes)
   }
 
   /**
@@ -35,7 +41,7 @@ export class Binary {
    * @returns number of remaining bytes
    */
   get remaining() {
-    return this.buffer.length - this.offset
+    return this.bytes.byteLength - this.offset
   }
 
   /**
@@ -43,7 +49,7 @@ export class Binary {
    * @returns slice of the buffer before the current offset
    */
   get before() {
-    return this.buffer.subarray(0, this.offset)
+    return this.bytes.subarray(0, this.offset)
   }
 
   /**
@@ -51,7 +57,7 @@ export class Binary {
    * @returns slice of the buffer after the current offset
    */
   get after() {
-    return this.buffer.subarray(this.offset)
+    return this.bytes.subarray(this.offset)
   }
 
   /**
@@ -60,9 +66,7 @@ export class Binary {
    * @returns slice of the buffer
    */
   get(length: number) {
-    if (this.offset + length > this.buffer.length)
-      throw new Error(`offset is out of bounds`)
-    return this.buffer.subarray(this.offset, this.offset + length)
+    return this.bytes.subarray(this.offset, this.offset + length)
   }
 
   /**
@@ -82,7 +86,7 @@ export class Binary {
    * @param array array
    */
   set(array: Uint8Array) {
-    this.buffer.set(array, this.offset)
+    this.bytes.set(array, this.offset)
   }
 
   /**
@@ -99,7 +103,7 @@ export class Binary {
    * @returns 8-bits unsigned number
    */
   getUint8() {
-    return this.buffer.readUInt8(this.offset)
+    return this.data.getUint8(this.offset)
   }
 
   /**
@@ -117,7 +121,7 @@ export class Binary {
    * @param x 8-bits unsigned number
    */
   setUint8(x: number) {
-    this.buffer.writeUInt8(x, this.offset)
+    this.data.setUint8(this.offset, x)
   }
 
   /**
@@ -134,7 +138,7 @@ export class Binary {
    * @returns 16-bits unsigned number
    */
   getUint16() {
-    return this.buffer.readUInt16BE(this.offset)
+    return this.data.getUint16(this.offset)
   }
 
   /**
@@ -152,7 +156,7 @@ export class Binary {
    * @param x 16-bits unsigned number
    */
   setUint16(x: number) {
-    this.buffer.writeUInt16BE(x, this.offset)
+    this.data.setUint16(this.offset, x)
   }
 
   /**
@@ -204,7 +208,7 @@ export class Binary {
    * @returns 32-bits unsigned number
    */
   getUint32() {
-    return this.buffer.readUInt32BE(this.offset)
+    return this.data.getUint32(this.offset)
   }
 
   /**
@@ -222,7 +226,7 @@ export class Binary {
    * @param x 32-bits unsigned number
    */
   setUint32(x: number) {
-    this.buffer.writeUInt32BE(x, this.offset)
+    this.data.setUint32(this.offset, x)
   }
 
   /**
@@ -239,7 +243,7 @@ export class Binary {
    * @returns 64-bits unsigned number
    */
   getUint64() {
-    return this.view.getBigUint64(this.offset)
+    return this.data.getBigUint64(this.offset)
   }
 
   /**
@@ -257,7 +261,7 @@ export class Binary {
    * @param x 64-bits unsigned number
    */
   setUint64(x: bigint) {
-    this.view.setBigUint64(this.offset, x)
+    this.data.setBigUint64(this.offset, x)
   }
 
   /**
@@ -276,7 +280,7 @@ export class Binary {
    * @returns string
    */
   getString(length: number, encoding?: BufferEncoding) {
-    return this.get(length).toString(encoding)
+    return Buffers.fromView(this.get(length)).toString(encoding)
   }
 
   /**
@@ -286,7 +290,7 @@ export class Binary {
    * @returns string
    */
   readString(length: number, encoding?: BufferEncoding) {
-    return this.read(length).toString(encoding)
+    return Buffers.fromView(this.read(length)).toString(encoding)
   }
 
   /**
@@ -313,9 +317,9 @@ export class Binary {
   get null() {
     let i = this.offset
 
-    while (i < this.buffer.length && this.buffer[i] > 0)
+    while (i < this.bytes.length && this.bytes[i] > 0)
       i++
-    if (i === this.buffer.length)
+    if (i === this.bytes.length)
       throw new Error(`Out of bounds NULL`)
     return i
   }
@@ -363,7 +367,7 @@ export class Binary {
    * @returns string
    */
   getNulledString(encoding?: BufferEncoding) {
-    return this.getNulled().toString(encoding)
+    return Buffers.fromView(this.getNulled()).toString(encoding)
   }
 
   /**
@@ -372,7 +376,7 @@ export class Binary {
    * @returns string
    */
   readNulledString(encoding?: BufferEncoding) {
-    return this.readNulled().toString(encoding)
+    return Buffers.fromView(this.readNulled()).toString(encoding)
   }
 
   /**
@@ -413,7 +417,7 @@ export class Binary {
     const chunks = new Array<Buffer>()
 
     while (this.remaining)
-      chunks.push(this.read(Math.min(this.remaining, length)))
+      chunks.push(Buffers.fromView(this.read(Math.min(this.remaining, length))))
     return chunks
   }
 
@@ -422,6 +426,6 @@ export class Binary {
    * @param end 
    */
   fill(end?: number) {
-    this.buffer.fill(0, this.offset, end)
+    this.bytes.fill(0, this.offset, end)
   }
 }
