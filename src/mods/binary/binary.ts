@@ -81,7 +81,7 @@ export class Binary {
    * Set an array to the buffer
    * @param array array
    */
-  set(array: Buffer) {
+  set(array: Uint8Array) {
     this.buffer.set(array, this.offset)
   }
 
@@ -89,7 +89,7 @@ export class Binary {
    * Write an array to the buffer
    * @param array array
    */
-  write(array: Buffer) {
+  write(array: Uint8Array) {
     this.set(array)
     this.offset += array.length
   }
