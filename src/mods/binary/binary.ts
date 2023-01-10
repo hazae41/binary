@@ -2,7 +2,7 @@ import { Buffers } from "libs/buffers/buffers.js"
 import { Bytes } from "libs/bytes/bytes.js"
 import { DataViews } from "libs/dataviews/dataviews.js"
 
-export class Binary<T extends ArrayBufferView> {
+export class Binary<T extends ArrayBufferView = ArrayBufferView> {
   private _view: T
 
   private _bytes: Uint8Array
