@@ -6,7 +6,7 @@ export class Binary<T extends Uint8Array> {
   readonly data: DataView
 
   /**
-   * An object with a Buffer and an offset
+   * An object with bytes and an offset
    * @param bytes Buffer
    */
   constructor(
