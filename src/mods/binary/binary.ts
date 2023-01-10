@@ -1,22 +1,52 @@
 import { Buffers } from "libs/buffers/buffers.js"
+import { Bytes } from "libs/bytes/bytes.js"
+import { DataViews } from "libs/dataviews/dataviews.js"
 
-export class Binary<T extends Uint8Array> {
-  offset = 0
+export class Binary<T extends ArrayBufferView> {
+  private _view: T
 
-  readonly data: DataView
+  private _bytes: Uint8Array
+  private _data: DataView
+  private _buffer: Buffer
+
+  public offset: number
 
   /**
    * An object with bytes and an offset
    * @param bytes Buffer
    */
-  constructor(
-    public bytes: T
-  ) {
-    this.data = new DataView(this.bytes.buffer, this.bytes.byteOffset, this.bytes.byteLength)
+  constructor(view: T, offset = 0) {
+    this._view = view
+
+    this._bytes = Bytes.fromView(view)
+    this._data = DataViews.fromView(view)
+    this._buffer = Buffers.fromView(this._bytes)
+
+    this.offset = offset
+  }
+
+  get view() {
+    return this._view
+  }
+
+  set view(view: T) {
+    this._view = view
+
+    this._bytes = Bytes.fromView(view)
+    this._data = DataViews.fromView(view)
+    this._buffer = Buffers.fromView(this._bytes)
+  }
+
+  get bytes() {
+    return this._bytes
+  }
+
+  get data() {
+    return this._data
   }
 
   get buffer() {
-    return Buffers.fromView(this.bytes)
+    return this._buffer
   }
 
   /**
@@ -41,7 +71,7 @@ export class Binary<T extends Uint8Array> {
    * @returns number of remaining bytes
    */
   get remaining() {
-    return this.bytes.byteLength - this.offset
+    return this._bytes.length - this.offset
   }
 
   /**
@@ -49,7 +79,7 @@ export class Binary<T extends Uint8Array> {
    * @returns slice of the buffer before the current offset
    */
   get before() {
-    return this.bytes.subarray(0, this.offset)
+    return this._bytes.subarray(0, this.offset)
   }
 
   /**
@@ -57,7 +87,7 @@ export class Binary<T extends Uint8Array> {
    * @returns slice of the buffer after the current offset
    */
   get after() {
-    return this.bytes.subarray(this.offset)
+    return this._bytes.subarray(this.offset)
   }
 
   /**
@@ -66,7 +96,7 @@ export class Binary<T extends Uint8Array> {
    * @returns slice of the buffer
    */
   get(length: number) {
-    return this.bytes.subarray(this.offset, this.offset + length)
+    return this._bytes.subarray(this.offset, this.offset + length)
   }
 
   /**
@@ -86,7 +116,7 @@ export class Binary<T extends Uint8Array> {
    * @param array array
    */
   set(array: Uint8Array) {
-    this.bytes.set(array, this.offset)
+    this._bytes.set(array, this.offset)
   }
 
   /**
@@ -103,7 +133,7 @@ export class Binary<T extends Uint8Array> {
    * @returns 8-bits unsigned number
    */
   getUint8() {
-    return this.data.getUint8(this.offset)
+    return this._data.getUint8(this.offset)
   }
 
   /**
@@ -121,7 +151,7 @@ export class Binary<T extends Uint8Array> {
    * @param x 8-bits unsigned number
    */
   setUint8(x: number) {
-    this.data.setUint8(this.offset, x)
+    this._data.setUint8(this.offset, x)
   }
 
   /**
@@ -138,7 +168,7 @@ export class Binary<T extends Uint8Array> {
    * @returns 16-bits unsigned number
    */
   getUint16() {
-    return this.data.getUint16(this.offset)
+    return this._data.getUint16(this.offset)
   }
 
   /**
@@ -156,7 +186,7 @@ export class Binary<T extends Uint8Array> {
    * @param x 16-bits unsigned number
    */
   setUint16(x: number) {
-    this.data.setUint16(this.offset, x)
+    this._data.setUint16(this.offset, x)
   }
 
   /**
@@ -208,7 +238,7 @@ export class Binary<T extends Uint8Array> {
    * @returns 32-bits unsigned number
    */
   getUint32() {
-    return this.data.getUint32(this.offset)
+    return this._data.getUint32(this.offset)
   }
 
   /**
@@ -226,7 +256,7 @@ export class Binary<T extends Uint8Array> {
    * @param x 32-bits unsigned number
    */
   setUint32(x: number) {
-    this.data.setUint32(this.offset, x)
+    this._data.setUint32(this.offset, x)
   }
 
   /**
@@ -243,7 +273,7 @@ export class Binary<T extends Uint8Array> {
    * @returns 64-bits unsigned number
    */
   getUint64() {
-    return this.data.getBigUint64(this.offset)
+    return this._data.getBigUint64(this.offset)
   }
 
   /**
@@ -261,7 +291,7 @@ export class Binary<T extends Uint8Array> {
    * @param x 64-bits unsigned number
    */
   setUint64(x: bigint) {
-    this.data.setBigUint64(this.offset, x)
+    this._data.setBigUint64(this.offset, x)
   }
 
   /**
@@ -317,9 +347,9 @@ export class Binary<T extends Uint8Array> {
   get null() {
     let i = this.offset
 
-    while (i < this.bytes.length && this.bytes[i] > 0)
+    while (i < this._bytes.length && this._bytes[i] > 0)
       i++
-    if (i === this.bytes.length)
+    if (i === this._bytes.length)
       throw new Error(`Out of bounds NULL`)
     return i
   }
@@ -426,6 +456,6 @@ export class Binary<T extends Uint8Array> {
    * @param end 
    */
   fill(end?: number) {
-    this.bytes.fill(0, this.offset, end)
+    this._bytes.fill(0, this.offset, end)
   }
 }

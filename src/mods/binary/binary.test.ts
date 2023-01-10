@@ -6,6 +6,11 @@ const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".cjs", ".ts")))
 
+test("From view", async () => {
+  const view = new Uint32Array([12345, 54321])
+  const binary = new Binary(view, 120)
+})
+
 test("Allocation", async () => {
   for (let i = 0; i < 32; i++) {
     const binary = Binary.alloc(i)
@@ -26,13 +31,13 @@ test("write then read", async () => {
 
   binary.write(buffer)
   assert(binary.offset === buffer.length)
-  assert(binary.bytes.equals(buffer))
+  assert(binary.buffer.equals(buffer))
 
   binary.offset = 0
 
   const buffer2 = binary.read(buffer.length)
   assert(binary.offset === buffer.length)
-  assert(binary.bytes.equals(buffer2))
+  assert(binary.buffer.equals(buffer2))
 
   assert(buffer.length === buffer2.length)
   assert(buffer.equals(buffer2))
@@ -56,14 +61,14 @@ test("writeUint8 then readUint8", async () => {
   binary.writeUint8(n)
   assert(binary.offset === 1)
   assert(binary.bytes.length === 1)
-  assert(binary.bytes.equals(Buffer.from([n])))
+  assert(binary.buffer.equals(Buffer.from([n])))
 
   binary.offset = 0
 
   const n2 = binary.readUint8()
   assert(binary.offset === 1)
   assert(binary.bytes.length === 1)
-  assert(binary.bytes.equals(Buffer.from([n])))
+  assert(binary.buffer.equals(Buffer.from([n])))
 
   assert(n === n2)
 
