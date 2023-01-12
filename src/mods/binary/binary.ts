@@ -20,7 +20,7 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
 
     this._bytes = Bytes.fromView(view)
     this._data = DataViews.fromView(view)
-    this._buffer = Buffers.fromView(this._bytes)
+    this._buffer = Buffers.fromView(view)
 
     this.offset = offset
   }
@@ -34,7 +34,7 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
 
     this._bytes = Bytes.fromView(view)
     this._data = DataViews.fromView(view)
-    this._buffer = Buffers.fromView(this._bytes)
+    this._buffer = Buffers.fromView(view)
   }
 
   get bytes() {
