@@ -7,7 +7,6 @@
     "strict": true,
     "downlevelIteration": true,
     "lib": [
-      "dom",
       "ESNext"
     ],
     "paths": {
@@ -17,20 +16,8 @@
       "libs/*": [
         "libs/*"
       ],
-    },
-    "plugins": [
-      {
-        "transform": "typescript-transform-paths"
-      },
-      {
-        "transform": "typescript-transform-paths",
-        "afterDeclarations": true
-      }
-    ]
+    }
   },
-  "exclude": [
-    "node_modules"
-  ],
   "include": [
     "./src/index.ts",
     "./src/**.test.ts"
