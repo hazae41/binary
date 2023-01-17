@@ -1,4 +1,5 @@
 import ts from "@rollup/plugin-typescript";
+import dts from "rollup-plugin-dts";
 import externals from "rollup-plugin-node-externals";
 
 export const config = [
@@ -31,7 +32,7 @@ export const config = [
       sourcemap: false,
       entryFileNames: "[name].d.ts",
     }],
-    plugins: [externals(), ts({ emitDeclarationOnly: true })]
+    plugins: [externals(), ts(), dts()]
   },
   {
     input: "./src/index.test.ts",
@@ -43,8 +44,7 @@ export const config = [
       sourcemap: true,
       entryFileNames: "[name].mjs"
     }],
-    plugins: [externals(), ts()],
-    external: ["@hazae41/phobos"]
+    plugins: [externals({ devDeps: true }), ts()],
   },
 ]
 
