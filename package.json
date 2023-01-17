@@ -22,7 +22,7 @@
     "prepare": "npm run build"
   },
   "devDependencies": {
-    "@hazae41/phobos": "^1.0.9",
+    "@hazae41/phobos": "^1.0.10",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^18.11.18",
     "rimraf": "^4.1.0",
