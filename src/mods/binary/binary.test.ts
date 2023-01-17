@@ -4,7 +4,7 @@ import { relative, resolve } from "node:path";
 
 const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
-console.log(relative(directory, pathname.replace(".cjs", ".ts")))
+console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
 test("From view", async () => {
   const view = new Uint32Array([12345, 54321])
