@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ESNext",
     "baseUrl": "./src",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "strict": true,
     "downlevelIteration": true,
     "lib": [
+      "DOM",
       "ESNext"
     ],
     "paths": {
@@ -15,6 +16,9 @@
       ],
       "libs/*": [
         "libs/*"
+      ],
+      "tests/*": [
+        "tests/*"
       ],
     }
   },
