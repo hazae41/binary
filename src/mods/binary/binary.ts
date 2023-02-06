@@ -1,5 +1,5 @@
+import { Bytes } from "@hazae41/bytes"
 import { Buffers } from "libs/buffers/buffers.js"
-import { Bytes } from "libs/bytes/bytes.js"
 import { DataViews } from "libs/dataviews/dataviews.js"
 
 export class Binary<T extends ArrayBufferView = ArrayBufferView> {
