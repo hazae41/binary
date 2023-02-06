@@ -55,7 +55,7 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * @returns Binary
    */
   static alloc(length: number) {
-    return new Binary(Buffer.alloc(length))
+    return new this(Bytes.alloc(length))
   }
 
   /**
@@ -64,7 +64,16 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * @returns Binary
    */
   static allocUnsafe(length: number) {
-    return new Binary(Buffer.allocUnsafe(length))
+    return new this(Bytes.allocUnsafe(length))
+  }
+
+  /**
+   * Create a new Binary with random bytes
+   * @param length 
+   * @returns Binary
+   */
+  static random(length: number) {
+    return new this(Bytes.random(length))
   }
 
   /**
