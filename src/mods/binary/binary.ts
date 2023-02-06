@@ -173,16 +173,16 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * Get a 16-bits unsigned number
    * @returns 16-bits unsigned number
    */
-  getUint16() {
-    return this.data.getUint16(this.offset)
+  getUint16(littleEndian?: boolean) {
+    return this.data.getUint16(this.offset, littleEndian)
   }
 
   /**
    * Read a 16-bits unsigned number
    * @returns 16-bits unsigned number
    */
-  readUint16() {
-    const x = this.getUint16()
+  readUint16(littleEndian?: boolean) {
+    const x = this.getUint16(littleEndian)
     this.offset += 2
     return x
   }
@@ -191,16 +191,16 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * Set a 16-bits unsigned number
    * @param x 16-bits unsigned number
    */
-  setUint16(x: number) {
-    this.data.setUint16(this.offset, x)
+  setUint16(x: number, littleEndian?: boolean) {
+    this.data.setUint16(this.offset, x, littleEndian)
   }
 
   /**
    * Write a 16-bits unsigned number
    * @param x 16-bits unsigned number
    */
-  writeUint16(x: number) {
-    this.setUint16(x)
+  writeUint16(x: number, littleEndian?: boolean) {
+    this.setUint16(x, littleEndian)
     this.offset += 2
   }
 
@@ -208,16 +208,19 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * Get a 24-bits unsigned number
    * @returns 24-bits unsigned number
    */
-  getUint24() {
-    return this.buffer.readUIntBE(this.offset, 3)
+  getUint24(littleEndian?: boolean) {
+    if (littleEndian)
+      return this.buffer.readUIntLE(this.offset, 3)
+    else
+      return this.buffer.readUIntBE(this.offset, 3)
   }
 
   /**
    * Read a 24-bits unsigned number
    * @returns 24-bits unsigned number
    */
-  readUint24() {
-    const x = this.getUint24()
+  readUint24(littleEndian?: boolean) {
+    const x = this.getUint24(littleEndian)
     this.offset += 3
     return x
   }
@@ -226,16 +229,19 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * Set a 24-bits unsigned number
    * @param x 24-bits unsigned number
    */
-  setUint24(x: number) {
-    this.buffer.writeUIntBE(x, this.offset, 3)
+  setUint24(x: number, littleEndian?: boolean) {
+    if (littleEndian)
+      this.buffer.writeUIntLE(x, this.offset, 3)
+    else
+      this.buffer.writeUIntBE(x, this.offset, 3)
   }
 
   /**
    * Write a 24-bits unsigned number
    * @param x 24-bits unsigned number
    */
-  writeUint24(x: number) {
-    this.setUint24(x)
+  writeUint24(x: number, littleEndian?: boolean) {
+    this.setUint24(x, littleEndian)
     this.offset += 3
   }
 
@@ -243,16 +249,16 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * Get a 32-bits unsigned number
    * @returns 32-bits unsigned number
    */
-  getUint32() {
-    return this.data.getUint32(this.offset)
+  getUint32(littleEndian?: boolean) {
+    return this.data.getUint32(this.offset, littleEndian)
   }
 
   /**
    * Read a 32-bits unsigned number
    * @returns 32-bits unsigned number
    */
-  readUint32() {
-    const x = this.getUint32()
+  readUint32(littleEndian?: boolean) {
+    const x = this.getUint32(littleEndian)
     this.offset += 4
     return x
   }
@@ -261,16 +267,16 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * Set a 32-bits unsigned number
    * @param x 32-bits unsigned number
    */
-  setUint32(x: number) {
-    this.data.setUint32(this.offset, x)
+  setUint32(x: number, littleEndian?: boolean) {
+    this.data.setUint32(this.offset, x, littleEndian)
   }
 
   /**
    * Write a 32-bits unsigned number
    * @param x 32-bits unsigned number
    */
-  writeUint32(x: number) {
-    this.setUint32(x)
+  writeUint32(x: number, littleEndian?: boolean) {
+    this.setUint32(x, littleEndian)
     this.offset += 4
   }
 
@@ -278,16 +284,16 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * Get a 64-bits unsigned number
    * @returns 64-bits unsigned number
    */
-  getUint64() {
-    return this.data.getBigUint64(this.offset)
+  getUint64(littleEndian?: boolean) {
+    return this.data.getBigUint64(this.offset, littleEndian)
   }
 
   /**
    * Read a 64-bits unsigned number
    * @returns 64-bits unsigned number
    */
-  readUint64() {
-    const x = this.getUint64()
+  readUint64(littleEndian?: boolean) {
+    const x = this.getUint64(littleEndian)
     this.offset += 8
     return x
   }
@@ -296,16 +302,16 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * Set a 64-bits unsigned number
    * @param x 64-bits unsigned number
    */
-  setUint64(x: bigint) {
-    this.data.setBigUint64(this.offset, x)
+  setUint64(x: bigint, littleEndian?: boolean) {
+    this.data.setBigUint64(this.offset, x, littleEndian)
   }
 
   /**
    * Write a 64-bits unsigned number
    * @param x 64-bits unsigned number
    */
-  writeUint64(x: bigint) {
-    this.setUint64(x)
+  writeUint64(x: bigint, littleEndian?: boolean) {
+    this.setUint64(x, littleEndian)
     this.offset += 8
   }
 
