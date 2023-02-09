@@ -3,50 +3,50 @@ import { Buffers } from "libs/buffers/buffers.js"
 import { DataViews } from "libs/dataviews/dataviews.js"
 
 export class Binary<T extends ArrayBufferView = ArrayBufferView> {
-  private _view: T
+  #view: T
 
-  private _bytes: Uint8Array
-  private _data: DataView
-  private _buffer: Buffer
+  #bytes: Uint8Array
+  #data: DataView
+  #buffer: Buffer
 
-  public offset: number
+  offset: number
 
   /**
    * An object with bytes and an offset
    * @param bytes Buffer
    */
   constructor(view: T, offset = 0) {
-    this._view = view
+    this.#view = view
 
-    this._bytes = Bytes.fromView(view)
-    this._data = DataViews.fromView(view)
-    this._buffer = Buffers.fromView(view)
+    this.#bytes = Bytes.fromView(view)
+    this.#data = DataViews.fromView(view)
+    this.#buffer = Buffers.fromView(view)
 
     this.offset = offset
   }
 
   get view() {
-    return this._view
+    return this.#view
   }
 
   set view(view: T) {
-    this._view = view
+    this.#view = view
 
-    this._bytes = Bytes.fromView(view)
-    this._data = DataViews.fromView(view)
-    this._buffer = Buffers.fromView(view)
+    this.#bytes = Bytes.fromView(view)
+    this.#data = DataViews.fromView(view)
+    this.#buffer = Buffers.fromView(view)
   }
 
   get bytes() {
-    return this._bytes
+    return this.#bytes
   }
 
   get data() {
-    return this._data
+    return this.#data
   }
 
   get buffer() {
-    return this._buffer
+    return this.#buffer
   }
 
   /**
