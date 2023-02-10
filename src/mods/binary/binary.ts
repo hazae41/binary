@@ -12,8 +12,9 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
   offset: number
 
   /**
-   * An object with bytes and an offset
-   * @param bytes Buffer
+   * A cursor for bytes
+   * @param view 
+   * @param offset 
    */
   constructor(view: T, offset = 0) {
     this.#view = view
@@ -84,25 +85,25 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
   }
 
   /**
-   * Get a slice of the buffer before the current offset
-   * @returns slice of the buffer before the current offset
+   * Get a subarray of the bytes before the current offset
+   * @returns subarray of the bytes before the current offset
    */
   get before() {
     return this.bytes.subarray(0, this.offset)
   }
 
   /**
-   * Get a slice of the buffer after the current offset
-   * @returns slice of the buffer after the current offset
+   * Get a subarray of the bytes after the current offset
+   * @returns subarray of the bytes after the current offset
    */
   get after() {
     return this.bytes.subarray(this.offset)
   }
 
   /**
-   * Get a slice of the buffer
+   * Get a subarray of the bytes
    * @param length 
-   * @returns slice of the buffer
+   * @returns subarray of the bytes
    */
   get(length: number) {
     if (length > this.remaining)
@@ -112,19 +113,19 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
   }
 
   /**
-   * Read a slice of the buffer
+   * Read a subarray of the bytes
    * @param length 
    * @param shallow 
-   * @returns slice of the buffer
+   * @returns subarray of the bytes
    */
   read(length: number) {
-    const slice = this.get(length)
+    const subarray = this.get(length)
     this.offset += length
-    return slice
+    return subarray
   }
 
   /**
-   * Set an array to the buffer
+   * Set an array to the bytes
    * @param array array
    */
   set(array: Uint8Array) {
@@ -135,7 +136,7 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
   }
 
   /**
-   * Write an array to the buffer
+   * Write an array to the bytes
    * @param array array
    */
   write(array: Uint8Array) {
@@ -376,21 +377,21 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
   }
 
   /**
-   * Get a NULL-terminated slice
-   * @returns slice of the buffer
+   * Get a NULL-terminated subarray
+   * @returns subarray of the bytes
    */
   getNulled() {
     return this.get(this.null)
   }
 
   /**
-   * Read a NULL-terminated slice
-   * @returns slice of the buffer
+   * Read a NULL-terminated subarray
+   * @returns subarray of the bytes
    */
   readNulled() {
-    const slice = this.read(this.null)
-    this.offset += slice.length
-    return slice
+    const subarray = this.read(this.null)
+    this.offset += subarray.length
+    return subarray
   }
 
   /**
