@@ -2,7 +2,9 @@ import { Bytes } from "@hazae41/bytes"
 import { Buffers } from "libs/buffers/buffers.js"
 import { DataViews } from "libs/dataviews/dataviews.js"
 
-export class Binary<T extends ArrayBufferView = ArrayBufferView> {
+export class Cursor<T extends ArrayBufferView = ArrayBufferView> {
+  readonly #class = Cursor
+
   #view: T
 
   #bytes: Uint8Array
@@ -106,8 +108,8 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * @returns subarray of the bytes
    */
   get(length: number) {
-    if (length > this.remaining)
-      throw new Error(`Binary.get() overflow`)
+    if (this.remaining < length)
+      throw new Error(`${this.#class.name}.get() overflow`)
 
     return this.bytes.subarray(this.offset, this.offset + length)
   }
@@ -129,8 +131,8 @@ export class Binary<T extends ArrayBufferView = ArrayBufferView> {
    * @param array array
    */
   set(array: Uint8Array) {
-    if (array.length > this.remaining)
-      throw new Error(`Binary.set() overflow`)
+    if (this.remaining < array.length)
+      throw new Error(`${this.#class.name}.set() overflow`)
 
     this.bytes.set(array, this.offset)
   }

@@ -1,1 +1,1 @@
-export * from "./binary/binary.test.js";
+export * from "./cursor/cursor.test.js";
