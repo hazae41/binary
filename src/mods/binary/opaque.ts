@@ -12,6 +12,14 @@ export class Opaque {
     readonly bytes: Uint8Array
   ) { }
 
+  /**
+   * New empty opaque
+   * @returns 
+   */
+  static empty() {
+    return new this(new Uint8Array())
+  }
+
   size() {
     return this.bytes.length
   }
