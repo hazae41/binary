@@ -2,18 +2,20 @@ import { Cursor } from "mods/cursor/cursor.js";
 
 export class Empty {
 
-  static size() {
+  constructor() { }
+
+  size() {
     return 0
   }
 
-  static write(cursor: Cursor) {
+  write(cursor: Cursor) {
     /**
      * NOOP 
      */
   }
 
   static read(cursor: Cursor) {
-    return this
+    return new this()
   }
 
 }
