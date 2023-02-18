@@ -1,3 +1,4 @@
+import { Bytes } from "@hazae41/bytes";
 import { Readable } from "mods/binary/readable.js";
 import { Cursor } from "mods/cursor/cursor.js";
 import { Writable } from "./writable.js";
@@ -12,12 +13,20 @@ export class Opaque {
     readonly bytes: Uint8Array
   ) { }
 
-  /**
-   * New empty opaque
-   * @returns 
-   */
   static empty() {
     return new this(new Uint8Array())
+  }
+
+  static alloc(length: number) {
+    return new this(Bytes.alloc(length))
+  }
+
+  static allocUnsafe(length: number) {
+    return new this(Bytes.allocUnsafe(length))
+  }
+
+  static random(length: number) {
+    return new this(Bytes.random(length))
   }
 
   size() {
