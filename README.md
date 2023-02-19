@@ -1,15 +1,14 @@
 <div align="center">
-<img width="500" src="https://user-images.githubusercontent.com/4405263/207937118-2a3e47f4-c291-4186-a1bc-69a9638fedd3.png" />
+<img width="500" src="https://user-images.githubusercontent.com/4405263/219944821-62f41f78-522b-4d10-92fb-923ae6c36602.png" />
 </div>
-<h3 align="center">
-Zero-copy binary data types 🏎️
-</h3>
 
 ```bash
 npm i @hazae41/binary
 ```
 
 [**Node Package 📦**](https://www.npmjs.com/package/@hazae41/binary)
+
+## Features
 
 ## Current features
 - 100% TypeScript and ESM
