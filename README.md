@@ -10,7 +10,7 @@ npm i @hazae41/binary
 
 ## Features
 
-## Current features
+### Current features
 - 100% TypeScript and ESM
 - No external dependencies
 - Unit-tested
