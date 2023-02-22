@@ -6,6 +6,11 @@ import { Cursor } from "mods/cursor/cursor.js"
 export interface Writable {
 
   /**
+   * Prepare this writable
+   */
+  prepare?(): void
+
+  /**
    * Get the amount of bytes
    */
   size(): number
@@ -26,6 +31,7 @@ export namespace Writable {
    * @returns 
    */
   export function toBytes(writable: Writable) {
+    writable.prepare?.()
     const cursor = Cursor.allocUnsafe(writable.size())
     writable.write(cursor)
 
