@@ -1,14 +1,9 @@
 import { Cursor } from "mods/cursor/cursor.js"
 
 /**
- * A binary data type writer
+ * A writable binary data type
  */
 export interface Writable {
-
-  /**
-   * Prepare this writable
-   */
-  prepare?(): void
 
   /**
    * Get the amount of bytes
@@ -31,7 +26,6 @@ export namespace Writable {
    * @returns 
    */
   export function toBytes(writable: Writable) {
-    writable.prepare?.()
     const cursor = Cursor.allocUnsafe(writable.size())
     writable.write(cursor)
 

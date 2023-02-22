@@ -4,6 +4,10 @@ export class Empty {
 
   constructor() { }
 
+  prepare() {
+    return this
+  }
+
   size() {
     return 0
   }

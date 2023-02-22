@@ -29,6 +29,10 @@ export class Opaque {
     return new this(Bytes.random(length))
   }
 
+  prepare() {
+    return this
+  }
+
   size() {
     return this.bytes.length
   }

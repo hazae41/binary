@@ -1,7 +1,7 @@
 import { Cursor } from "mods/cursor/cursor.js";
 
 /**
- * A binary data type reader
+ * A readable binary data type
  */
 export interface Readable<T> {
 
