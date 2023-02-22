@@ -47,6 +47,15 @@ export class Opaque {
   }
 
   /**
+   * Try to transform this opaque into a binary data type
+   * @param readable 
+   * @returns T or undefined
+   */
+  tryInto<T>(readable: Readable<T>) {
+    return Readable.tryFromBytes(readable, this.bytes)
+  }
+
+  /**
    * Create an opaque from a binary data type
    * @param writable 
    * @returns 

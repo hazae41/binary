@@ -57,12 +57,9 @@ export namespace Readable {
    * @returns 
    */
   export function tryFromBytes<T>(readable: Readable<T>, bytes: Uint8Array) {
-    const cursor = new Cursor(bytes)
-    const result = tryRead(readable, cursor)
-
-    if (result !== undefined && cursor.remaining)
-      throw new Error(`Readable.tryFromBytes got ${cursor.remaining} remaining bytes`)
-    return result
+    try {
+      return fromBytes(readable, bytes)
+    } catch (e: unknown) { }
   }
 
 }
