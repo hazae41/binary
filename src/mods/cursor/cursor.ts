@@ -80,10 +80,17 @@ export class Cursor<T extends ArrayBufferView = ArrayBufferView> {
   }
 
   /**
+   * @returns total number of bytes
+   */
+  get length() {
+    return this.bytes.length
+  }
+
+  /**
    * @returns number of remaining bytes
    */
   get remaining() {
-    return this.bytes.length - this.offset
+    return this.length - this.offset
   }
 
   /**
@@ -452,34 +459,25 @@ export class Cursor<T extends ArrayBufferView = ArrayBufferView> {
   }
 
   /**
-   * @deprecated
-   * @param offset 
-   * @returns 
+   * Fill length bytes with value after offset
+   * @param value value to fill
+   * @param length length to fill
    */
-  reread(offset: number) {
-    const head = this.offset
-    this.offset = offset
-    return this.read(head - offset)
+  fill(value: number, length: number) {
+    this.bytes.fill(value, this.offset, this.offset + length)
+    this.offset += length
   }
 
   /**
-   * @deprecated
+   * Split into chunks of maximum length bytes
    * @param length 
    * @returns 
    */
-  split(length: number) {
-    const chunks = new Array<Buffer>()
-
-    while (this.remaining)
-      chunks.push(Buffers.fromView(this.read(Math.min(this.remaining, length))))
-    return chunks
+  *split(length: number) {
+    while (this.remaining >= length)
+      yield this.read(length)
+    if (this.remaining)
+      yield this.read(this.remaining)
   }
 
-  /**
-   * @deprecated
-   * @param end 
-   */
-  fill(end?: number) {
-    this.bytes.fill(0, this.offset, end)
-  }
 }

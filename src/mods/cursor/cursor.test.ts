@@ -1,5 +1,7 @@
+import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { Cursor } from "mods/cursor/cursor.js";
+import { webcrypto } from "node:crypto";
 import { relative, resolve } from "node:path";
 
 const directory = resolve("./dist/test/")
@@ -145,4 +147,25 @@ test("writeUint32 then readUint32", async () => {
 
   // assert(throws(() => cursor.writeUint16(2 ** 32)))
   // assert(throws(() => cursor.writeUint16(-1)))
+})
+
+test("fill", async ({ test }) => {
+  const cursor = Cursor.alloc(5)
+
+  cursor.offset += 2
+  cursor.fill(1, 2)
+
+  const expected = new Uint8Array([0, 0, 1, 1, 0])
+  assert(Bytes.equals(cursor.bytes, expected))
+})
+
+test("split", async ({ test }) => {
+  globalThis.crypto = webcrypto as any
+
+  const cursor = Cursor.random(256)
+  const chunks = [...cursor.split(100)]
+
+  assert(chunks[0].length === 100)
+  assert(chunks[1].length === 100)
+  assert(chunks[2].length === 56)
 })
