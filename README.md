@@ -40,7 +40,7 @@ class MyObject implements Writable {
 
       return Ok.void()
     } catch(e: unknown) {
-      return new Err(e as Error)
+      return Err.cast(e, Error)
     }
   }
 
@@ -63,10 +63,14 @@ class MyObject {
   ) {}
 
   static read(cursor: Cursor) {
-    const x = cursor.readUint8()
-    const y = cursor.readUint16()
+    try {
+      const x = cursor.readUint8().unwrap()
+      const y = cursor.readUint16().unwrap()
 
-    return new this(x, y)
+      return new Ok(new this(x, y))
+    } catch(e: unknown) {
+      return Err.cast(e, Error)
+    }
   }
 
 }
@@ -74,7 +78,7 @@ class MyObject {
 
 ```typescript
 const bytes = new Uint8Array([1, 2, 3])
-const myobject = Readable.fromBytes(MyObject, bytes) // MyObject(1, 515)
+const myobject = Readable.fromBytes(MyObject, bytes).unwrap() // MyObject(1, 515)
 ```
 
 #### Opaque
@@ -83,12 +87,12 @@ This is a binary data type that just holds bytes, it can be used when a binary d
 
 ```typescript
 const bytes = new Uint8Array([1, 2, 3])
-const opaque = Readable.fromBytes(SafeOpaque, bytes) // Opaque(Uint8Array([1, 2, 3]))
-const myobject = opaque.into(MyObject) // MyObject(1, 515)
+const opaque = Readable.fromBytes(SafeOpaque, bytes).unwrap() // Opaque(Uint8Array([1, 2, 3]))
+const myobject = opaque.tryInto(MyObject).unwrap() // MyObject(1, 515)
 ```
 
 ```typescript
 const myobject = new MyObject(1, 515)
-const opaque = Opaque.from(myobject) // Opaque(Uint8Array([1, 2, 3]))
-const bytes = Writable.toBytes(opaque) // Uint8Array([1, 2, 3])
+const opaque = Opaque.tryFrom(myobject).unwrap() // Opaque(Uint8Array([1, 2, 3]))
+const bytes = Writable.toBytes(opaque).unwrap() // Uint8Array([1, 2, 3])
 ```
