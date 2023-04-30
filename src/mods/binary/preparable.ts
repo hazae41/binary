@@ -1,3 +1,5 @@
+import { Bytes } from "@hazae41/bytes";
+import { Result } from "@hazae41/result";
 import { Writable } from "mods/binary/writable.js";
 
 /**
@@ -8,7 +10,7 @@ export interface Preparable {
   /**
    * Prepare to a writable
    */
-  prepare(): Writable
+  prepare(): Result<Writable, Error>
 
 }
 
@@ -19,8 +21,13 @@ export namespace Preparable {
     * @param writable 
     * @returns 
     */
-  export function toBytes(preparable: Preparable) {
-    return Writable.toBytes(preparable.prepare())
+  export function toBytes(preparable: Preparable): Result<Bytes, Error> {
+    const writable = preparable.prepare()
+
+    if (writable.isErr())
+      return writable
+
+    return Writable.toBytes(writable.inner)
   }
 
 }

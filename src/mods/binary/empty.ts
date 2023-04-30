@@ -1,4 +1,4 @@
-import { Cursor } from "mods/cursor/cursor.js";
+import { Cursor } from "@hazae41/cursor";
 
 export class Empty {
 

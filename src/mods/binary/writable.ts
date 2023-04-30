@@ -1,4 +1,6 @@
-import { Cursor } from "mods/cursor/cursor.js"
+import { Bytes } from "@hazae41/bytes"
+import { Cursor } from "@hazae41/cursor"
+import { Err, Ok, Result } from "@hazae41/result"
 
 /**
  * A writable binary data type
@@ -14,7 +16,7 @@ export interface Writable {
    * Write bytes to a cursor
    * @param cursor 
    */
-  write(cursor: Cursor): void
+  write(cursor: Cursor): Result<void, Error>
 
 }
 
@@ -25,13 +27,15 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function toBytes(writable: Writable) {
+  export function toBytes(writable: Writable): Result<Bytes, Error> {
     const cursor = Cursor.allocUnsafe(writable.size())
-    writable.write(cursor)
+    const result = writable.write(cursor)
 
+    if (result.isErr())
+      return result
     if (cursor.remaining)
-      throw new Error(`Writable.toBytes got ${cursor.remaining} remaining bytes`)
-    return cursor.bytes
+      return Err.error(`Writable.toBytes got ${cursor.remaining} remaining bytes`)
+    return new Ok(cursor.bytes)
   }
 
 }

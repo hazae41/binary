@@ -1,4 +1,5 @@
-import { Cursor } from "mods/cursor/cursor.js";
+import { Cursor } from "@hazae41/cursor";
+import { Err, Result } from "@hazae41/result";
 
 /**
  * A readable binary data type
@@ -9,7 +10,7 @@ export interface Readable<T> {
    * Read bytes from a cursor
    * @param cursor 
    */
-  read(cursor: Cursor): T
+  read(cursor: Cursor): Result<T, Error>
 
 }
 
@@ -17,20 +18,20 @@ export namespace Readable {
 
   /**
    * Try to read a binary data type from a cursor
-   * - on success: return the binary data type
-   * - on error: rollback the offset and return undefined
+   * - on Ok: returns the Ok containing the BDT
+   * - on Err: rollback the offset, and returns the Err
    * @param readable 
    * @param cursor 
    * @returns 
    */
-  export function tryRead<T>(readable: Readable<T>, cursor: Cursor) {
+  export function tryRead<T>(readable: Readable<T>, cursor: Cursor): Result<T, Error> {
     const offset = cursor.offset
+    const result = readable.read(cursor)
 
-    try {
-      return readable.read(cursor)
-    } catch (e: unknown) {
+    if (result.isErr())
       cursor.offset = offset
-    }
+
+    return result
   }
 
   /**
@@ -39,27 +40,15 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function fromBytes<T>(readable: Readable<T>, bytes: Uint8Array) {
+  export function fromBytes<T>(readable: Readable<T>, bytes: Uint8Array): Result<T, Error> {
     const cursor = new Cursor(bytes)
     const result = readable.read(cursor)
 
+    if (result.isErr())
+      return result
     if (cursor.remaining)
-      throw new Error(`Readable.fromBytes got ${cursor.remaining} remaining bytes`)
+      return Err.error(`Readable.fromBytes got ${cursor.remaining} remaining bytes`)
     return result
-  }
-
-  /**
-   * Try to read a binary data type from bytes
-   * - on success: return the binary data type
-   * - on error: rollback the offset and return undefined
-   * @param readable 
-   * @param bytes 
-   * @returns 
-   */
-  export function tryFromBytes<T>(readable: Readable<T>, bytes: Uint8Array) {
-    try {
-      return fromBytes(readable, bytes)
-    } catch (e: unknown) { }
   }
 
 }

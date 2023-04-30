@@ -1,31 +1,32 @@
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
+import { Ok, Result } from "@hazae41/result";
 import { Readable } from "mods/binary/readable.js";
-import { Cursor } from "mods/cursor/cursor.js";
 import { Writable } from "./writable.js";
 
-export class Opaque {
+export class Opaque<T extends Uint8Array = Uint8Array> {
 
   /**
    * A binary data type that just holds bytes
    * @param bytes 
    */
   constructor(
-    readonly bytes: Uint8Array
+    readonly bytes: T
   ) { }
 
   static empty() {
-    return new this(new Uint8Array())
+    return new this(Bytes.alloc(0))
   }
 
-  static alloc(length: number) {
+  static alloc<N extends number>(length: N) {
     return new this(Bytes.alloc(length))
   }
 
-  static allocUnsafe(length: number) {
+  static allocUnsafe<N extends number>(length: N) {
     return new this(Bytes.allocUnsafe(length))
   }
 
-  static random(length: number) {
+  static random<N extends number>(length: N) {
     return new this(Bytes.random(length))
   }
 
@@ -38,7 +39,7 @@ export class Opaque {
   }
 
   write(cursor: Cursor) {
-    cursor.write(this.bytes)
+    return cursor.write(this.bytes)
   }
 
   /**
@@ -46,17 +47,8 @@ export class Opaque {
    * @param readable 
    * @returns 
    */
-  into<T>(readable: Readable<T>) {
+  into<T>(readable: Readable<T>): Result<T, Error> {
     return Readable.fromBytes(readable, this.bytes)
-  }
-
-  /**
-   * Try to transform this opaque into a binary data type
-   * @param readable 
-   * @returns T or undefined
-   */
-  tryInto<T>(readable: Readable<T>) {
-    return Readable.tryFromBytes(readable, this.bytes)
   }
 
   /**
@@ -66,7 +58,11 @@ export class Opaque {
    */
   static from(writable: Writable) {
     const bytes = Writable.toBytes(writable)
-    return Readable.fromBytes(UnsafeOpaque, bytes)
+
+    if (bytes.isErr())
+      return bytes
+
+    return Readable.fromBytes(UnsafeOpaque, bytes.inner)
   }
 
 }
@@ -76,10 +72,13 @@ export class Opaque {
  */
 export namespace UnsafeOpaque {
 
-  export function read(cursor: Cursor) {
+  export function read(cursor: Cursor): Result<Opaque, Error> {
     const bytes = cursor.read(cursor.remaining)
 
-    return new Opaque(bytes)
+    if (bytes.isErr())
+      return bytes
+
+    return new Ok(new Opaque(bytes.inner))
   }
 
 }
@@ -89,11 +88,13 @@ export namespace UnsafeOpaque {
  */
 export namespace SafeOpaque {
 
-  export function read(cursor: Cursor) {
+  export function read(cursor: Cursor): Result<Opaque, Error> {
     const bytes = cursor.read(cursor.remaining)
-    const copy = new Uint8Array(bytes)
 
-    return new Opaque(copy)
+    if (bytes.isErr())
+      return bytes
+
+    return new Ok(new Opaque(new Uint8Array(bytes.inner)))
   }
 
 }

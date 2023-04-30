@@ -11,9 +11,9 @@ console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 test("Opaque", async ({ test }) => {
   const bytes = new Uint8Array([1, 2, 3, 4, 5])
 
-  const opaque = Readable.fromBytes(SafeOpaque, bytes)
-  const opaque2 = opaque.into(UnsafeOpaque)
-  const opaque3 = Opaque.from(opaque2)
+  const opaque = Readable.fromBytes(SafeOpaque, bytes).unwrap()
+  const opaque2 = opaque.into(UnsafeOpaque).unwrap()
+  const opaque3 = Opaque.from(opaque2).unwrap()
 
   assert(Bytes.equals(opaque.bytes, opaque2.bytes))
   assert(Bytes.equals(opaque2.bytes, opaque3.bytes))
