@@ -13,8 +13,9 @@ npm i @hazae41/binary
 ### Current features
 - 100% TypeScript and ESM
 - No external dependencies
-- Unit-tested
 - Zero-copy reading and writing
+- Rust-like patterns
+- Unit-tested
 
 ## Usage
 
@@ -32,9 +33,15 @@ class MyObject implements Writable {
     return 1 + 2
   }
 
-  write(cursor: Cursor) {
-    cursor.writeUint8(this.x).unwrap()
-    cursor.writeUint16(this.y).unwrap()
+  write(cursor: Cursor): Result<this, Error> {
+    try {
+      cursor.writeUint8(this.x).unwrap()
+      cursor.writeUint16(this.y).unwrap()
+
+      return Ok.void()
+    } catch(e: unknown) {
+      return new Err(e as Error)
+    }
   }
 
 }
@@ -42,7 +49,7 @@ class MyObject implements Writable {
 
 ```typescript
 const myobject = new MyObject(1, 515)
-const bytes = Writable.toBytes(myobject) // Uint8Array([1, 2, 3])
+const bytes = Writable.toBytes(myobject).unwrap() // Uint8Array([1, 2, 3])
 ```
 
 #### Readable

@@ -17,7 +17,7 @@ export class Empty {
   }
 
   write(cursor: Cursor): Result<void, never> {
-    return new Ok<void>(undefined)
+    return Ok.void()
   }
 
   static read(cursor: Cursor): Result<Empty, never> {
