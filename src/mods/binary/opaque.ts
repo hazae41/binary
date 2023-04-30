@@ -1,10 +1,10 @@
-import { Bytes } from "@hazae41/bytes";
+import { Bytes, Sized } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 import { Readable } from "mods/binary/readable.js";
 import { Writable } from "./writable.js";
 
-export class Opaque<T extends Uint8Array = Uint8Array> {
+export class Opaque<T extends Bytes = Bytes> {
 
   /**
    * A binary data type that just holds bytes
@@ -26,19 +26,23 @@ export class Opaque<T extends Uint8Array = Uint8Array> {
     return new this(Bytes.allocUnsafe(length))
   }
 
+  static from<N extends number>(sized: Sized<number, N>) {
+    return new this(Bytes.from(sized))
+  }
+
   static random<N extends number>(length: N) {
     return new this(Bytes.random(length))
   }
 
-  prepare() {
-    return this
+  prepare(): Result<this, never> {
+    return new Ok(this)
   }
 
   size() {
     return this.bytes.length
   }
 
-  write(cursor: Cursor) {
+  write(cursor: Cursor): Result<void, Error> {
     return cursor.write(this.bytes)
   }
 
@@ -47,7 +51,7 @@ export class Opaque<T extends Uint8Array = Uint8Array> {
    * @param readable 
    * @returns 
    */
-  into<T>(readable: Readable<T>): Result<T, Error> {
+  tryInto<T>(readable: Readable<T>): Result<T, Error> {
     return Readable.fromBytes(readable, this.bytes)
   }
 
@@ -56,7 +60,7 @@ export class Opaque<T extends Uint8Array = Uint8Array> {
    * @param writable 
    * @returns 
    */
-  static from(writable: Writable) {
+  static tryFrom(writable: Writable): Result<Opaque, Error> {
     const bytes = Writable.toBytes(writable)
 
     if (bytes.isErr())
@@ -94,7 +98,9 @@ export namespace SafeOpaque {
     if (bytes.isErr())
       return bytes
 
-    return new Ok(new Opaque(new Uint8Array(bytes.inner)))
+    const copy = new Uint8Array(bytes.inner)
+
+    return new Ok(new Opaque(copy))
   }
 
 }
