@@ -10,7 +10,7 @@ export interface Readable<T> {
    * Read bytes from a cursor
    * @param cursor 
    */
-  read(cursor: Cursor): Result<T, Error>
+  tryRead(cursor: Cursor): Result<T, Error>
 
 }
 
@@ -24,9 +24,9 @@ export namespace Readable {
    * @param cursor 
    * @returns 
    */
-  export function tryRead<T>(readable: Readable<T>, cursor: Cursor): Result<T, Error> {
+  export function tryReadOrRollback<T>(readable: Readable<T>, cursor: Cursor): Result<T, Error> {
     const offset = cursor.offset
-    const result = readable.read(cursor)
+    const result = readable.tryRead(cursor)
 
     if (result.isErr())
       cursor.offset = offset
@@ -40,14 +40,16 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function fromBytes<T>(readable: Readable<T>, bytes: Uint8Array): Result<T, Error> {
+  export function tryReadFromBytes<T>(readable: Readable<T>, bytes: Uint8Array): Result<T, Error> {
     const cursor = new Cursor(bytes)
-    const result = readable.read(cursor)
+    const result = readable.tryRead(cursor)
 
     if (result.isErr())
       return result
+
     if (cursor.remaining)
       return Err.error(`Readable.fromBytes got ${cursor.remaining} remaining bytes`)
+
     return result
   }
 

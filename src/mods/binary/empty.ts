@@ -8,19 +8,19 @@ export class Empty {
    */
   constructor() { }
 
-  prepare(): Result<this, never> {
+  tryPrepare(): Result<this, never> {
     return new Ok(this)
   }
 
-  size() {
-    return 0
+  trySize(): Result<number, never> {
+    return new Ok(0)
   }
 
-  write(cursor: Cursor): Result<void, never> {
+  tryWrite(cursor: Cursor): Result<void, never> {
     return Ok.void()
   }
 
-  static read(cursor: Cursor): Result<Empty, never> {
+  static tryRead(cursor: Cursor): Result<Empty, never> {
     return new Ok(new this())
   }
 

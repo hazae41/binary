@@ -10,13 +10,13 @@ export interface Writable {
   /**
    * Get the amount of bytes
    */
-  size(): number
+  trySize(): Result<number, Error>
 
   /**
    * Write bytes to a cursor
    * @param cursor 
    */
-  write(cursor: Cursor): Result<void, Error>
+  tryWrite(cursor: Cursor): Result<void, Error>
 
 }
 
@@ -27,14 +27,21 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function toBytes(writable: Writable): Result<Bytes, Error> {
-    const cursor = Cursor.allocUnsafe(writable.size())
-    const result = writable.write(cursor)
+  export function tryToBytes(writable: Writable): Result<Bytes, Error> {
+    const size = writable.trySize()
+
+    if (size.isErr())
+      return size
+
+    const cursor = Cursor.allocUnsafe(size.inner)
+    const result = writable.tryWrite(cursor)
 
     if (result.isErr())
       return result
+
     if (cursor.remaining)
       return Err.error(`Writable.toBytes got ${cursor.remaining} remaining bytes`)
+
     return new Ok(cursor.bytes)
   }
 

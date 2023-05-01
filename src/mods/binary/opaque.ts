@@ -34,16 +34,16 @@ export class Opaque<T extends Bytes = Bytes> {
     return new this(Bytes.random(length))
   }
 
-  prepare(): Result<this, never> {
+  tryPrepare(): Result<this, never> {
     return new Ok(this)
   }
 
-  size() {
-    return this.bytes.length
+  trySize(): Result<number, never> {
+    return new Ok(this.bytes.length)
   }
 
-  write(cursor: Cursor): Result<void, Error> {
-    return cursor.write(this.bytes)
+  tryWrite(cursor: Cursor): Result<void, Error> {
+    return cursor.tryWrite(this.bytes)
   }
 
   /**
@@ -52,7 +52,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @returns 
    */
   tryInto<T>(readable: Readable<T>): Result<T, Error> {
-    return Readable.fromBytes(readable, this.bytes)
+    return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
   /**
@@ -61,12 +61,12 @@ export class Opaque<T extends Bytes = Bytes> {
    * @returns 
    */
   static tryFrom(writable: Writable): Result<Opaque, Error> {
-    const bytes = Writable.toBytes(writable)
+    const bytes = Writable.tryToBytes(writable)
 
     if (bytes.isErr())
       return bytes
 
-    return Readable.fromBytes(UnsafeOpaque, bytes.inner)
+    return Readable.tryReadFromBytes(UnsafeOpaque, bytes.inner)
   }
 
 }
@@ -76,8 +76,8 @@ export class Opaque<T extends Bytes = Bytes> {
  */
 export namespace UnsafeOpaque {
 
-  export function read(cursor: Cursor): Result<Opaque, Error> {
-    const bytes = cursor.read(cursor.remaining)
+  export function tryRead(cursor: Cursor): Result<Opaque, Error> {
+    const bytes = cursor.tryRead(cursor.remaining)
 
     if (bytes.isErr())
       return bytes
@@ -92,8 +92,8 @@ export namespace UnsafeOpaque {
  */
 export namespace SafeOpaque {
 
-  export function read(cursor: Cursor): Result<Opaque, Error> {
-    const bytes = cursor.read(cursor.remaining)
+  export function tryRead(cursor: Cursor): Result<Opaque, Error> {
+    const bytes = cursor.tryRead(cursor.remaining)
 
     if (bytes.isErr())
       return bytes

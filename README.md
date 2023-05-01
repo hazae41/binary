@@ -33,14 +33,14 @@ class MyObject implements Writable {
     return 1 + 2
   }
 
-  write(cursor: Cursor): Result<this, Error> {
+  write(cursor: Cursor): Result<void, Error> {
     try {
-      cursor.writeUint8(this.x).unwrap()
-      cursor.writeUint16(this.y).unwrap()
+      cursor.tryWriteUint8(this.x).throw()
+      cursor.tryWriteUint16(this.y).throw()
 
       return Ok.void()
     } catch(e: unknown) {
-      return Err.cast(e, Error)
+      return Err.catch(e, Error)
     }
   }
 
@@ -49,7 +49,7 @@ class MyObject implements Writable {
 
 ```typescript
 const myobject = new MyObject(1, 515)
-const bytes = Writable.toBytes(myobject).unwrap() // Uint8Array([1, 2, 3])
+const bytes = Writable.tryToBytes(myobject).unwrap() // Uint8Array([1, 2, 3])
 ```
 
 #### Readable
@@ -62,14 +62,14 @@ class MyObject {
     readonly y: number
   ) {}
 
-  static read(cursor: Cursor) {
+  static read(cursor: Cursor): Result<MyObject, Error> {
     try {
-      const x = cursor.readUint8().unwrap()
-      const y = cursor.readUint16().unwrap()
+      const x = cursor.tryReadUint8().throw()
+      const y = cursor.tryReadUint16().throw()
 
       return new Ok(new this(x, y))
     } catch(e: unknown) {
-      return Err.cast(e, Error)
+      return Err.catch(e, Error)
     }
   }
 
@@ -78,7 +78,7 @@ class MyObject {
 
 ```typescript
 const bytes = new Uint8Array([1, 2, 3])
-const myobject = Readable.fromBytes(MyObject, bytes).unwrap() // MyObject(1, 515)
+const myobject = Readable.tryFromBytes(MyObject, bytes).unwrap() // MyObject(1, 515)
 ```
 
 #### Opaque

@@ -11,7 +11,7 @@ console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 test("Opaque", async ({ test }) => {
   const bytes = new Uint8Array([1, 2, 3, 4, 5])
 
-  const opaque = Readable.fromBytes(SafeOpaque, bytes).unwrap()
+  const opaque = Readable.tryReadFromBytes(SafeOpaque, bytes).unwrap()
   const opaque2 = opaque.tryInto(UnsafeOpaque).unwrap()
   const opaque3 = Opaque.tryFrom(opaque2).unwrap()
 

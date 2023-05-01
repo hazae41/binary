@@ -10,7 +10,7 @@ export interface Preparable {
   /**
    * Prepare to a writable
    */
-  prepare(): Result<Writable, Error>
+  tryPrepare(): Result<Writable, Error>
 
 }
 
@@ -21,13 +21,13 @@ export namespace Preparable {
     * @param writable 
     * @returns 
     */
-  export function toBytes(preparable: Preparable): Result<Bytes, Error> {
-    const writable = preparable.prepare()
+  export function tryPreparetoBytes(preparable: Preparable): Result<Bytes, Error> {
+    const writable = preparable.tryPrepare()
 
     if (writable.isErr())
       return writable
 
-    return Writable.toBytes(writable.inner)
+    return Writable.tryToBytes(writable.inner)
   }
 
 }
