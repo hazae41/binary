@@ -21,7 +21,7 @@ export namespace Preparable {
     * @param writable 
     * @returns 
     */
-  export function tryPreparetoBytes(preparable: Preparable): Result<Bytes, Error> {
+  export function tryPrepareToBytes(preparable: Preparable): Result<Bytes, Error> {
     const writable = preparable.tryPrepare()
 
     if (writable.isErr())
