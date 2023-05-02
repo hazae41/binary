@@ -1,5 +1,5 @@
 import { Bytes, Sized } from "@hazae41/bytes";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadOverflowError, CursorWriteOverflowError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 import { Readable } from "mods/binary/readable.js";
 import { Writable } from "./writable.js";
@@ -42,7 +42,7 @@ export class Opaque<T extends Bytes = Bytes> {
     return new Ok(this.bytes.length)
   }
 
-  tryWrite(cursor: Cursor): Result<void, Error> {
+  tryWrite(cursor: Cursor): Result<void, CursorWriteOverflowError> {
     return cursor.tryWrite(this.bytes)
   }
 
@@ -76,7 +76,7 @@ export class Opaque<T extends Bytes = Bytes> {
  */
 export namespace UnsafeOpaque {
 
-  export function tryRead(cursor: Cursor): Result<Opaque, Error> {
+  export function tryRead(cursor: Cursor): Result<Opaque, CursorReadOverflowError> {
     const bytes = cursor.tryRead(cursor.remaining)
 
     if (bytes.isErr())
@@ -92,7 +92,7 @@ export namespace UnsafeOpaque {
  */
 export namespace SafeOpaque {
 
-  export function tryRead(cursor: Cursor): Result<Opaque, Error> {
+  export function tryRead(cursor: Cursor): Result<Opaque, CursorReadOverflowError> {
     const bytes = cursor.tryRead(cursor.remaining)
 
     if (bytes.isErr())
