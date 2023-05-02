@@ -27,7 +27,7 @@ export namespace Preparable {
     if (writable.isErr())
       return writable
 
-    return Writable.tryToBytes(writable.inner)
+    return Writable.tryWriteToBytes(writable.inner)
   }
 
 }

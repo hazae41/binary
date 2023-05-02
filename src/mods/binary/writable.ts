@@ -27,7 +27,7 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function tryToBytes(writable: Writable): Result<Bytes, Error> {
+  export function tryWriteToBytes(writable: Writable): Result<Bytes, Error> {
     const size = writable.trySize()
 
     if (size.isErr())

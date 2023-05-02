@@ -61,12 +61,12 @@ export class Opaque<T extends Bytes = Bytes> {
    * @returns 
    */
   static tryFrom(writable: Writable): Result<Opaque, Error> {
-    const bytes = Writable.tryToBytes(writable)
+    const bytes = Writable.tryWriteToBytes(writable)
 
     if (bytes.isErr())
       return bytes
 
-    return Readable.tryReadFromBytes(UnsafeOpaque, bytes.inner)
+    return new Ok(new this(bytes.inner))
   }
 
 }
