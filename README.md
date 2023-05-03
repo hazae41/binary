@@ -34,14 +34,12 @@ class MyObject implements Writable {
   }
 
   write(cursor: Cursor): Result<void, Error> {
-    try {
+    return Result.unthrowSync(() => {
       cursor.tryWriteUint8(this.x).throw()
       cursor.tryWriteUint16(this.y).throw()
 
       return Ok.void()
-    } catch(e: unknown) {
-      return Err.catch(e, Error)
-    }
+    }, Error)
   }
 
 }
@@ -49,7 +47,7 @@ class MyObject implements Writable {
 
 ```typescript
 const myobject = new MyObject(1, 515)
-const bytes = Writable.tryToBytes(myobject).unwrap() // Uint8Array([1, 2, 3])
+const bytes = Writable.tryWriteToBytes(myobject).unwrap() // Uint8Array([1, 2, 3])
 ```
 
 #### Readable
@@ -63,14 +61,12 @@ class MyObject {
   ) {}
 
   static read(cursor: Cursor): Result<MyObject, Error> {
-    try {
+    return Result.unthrowSync(() => {
       const x = cursor.tryReadUint8().throw()
       const y = cursor.tryReadUint16().throw()
 
       return new Ok(new this(x, y))
-    } catch(e: unknown) {
-      return Err.catch(e, Error)
-    }
+    }, Error)
   }
 
 }
@@ -78,7 +74,7 @@ class MyObject {
 
 ```typescript
 const bytes = new Uint8Array([1, 2, 3])
-const myobject = Readable.tryFromBytes(MyObject, bytes).unwrap() // MyObject(1, 515)
+const myobject = Readable.tryReadFromBytes(MyObject, bytes).unwrap() // MyObject(1, 515)
 ```
 
 #### Opaque
@@ -87,12 +83,12 @@ This is a binary data type that just holds bytes, it can be used when a binary d
 
 ```typescript
 const bytes = new Uint8Array([1, 2, 3])
-const opaque = Readable.fromBytes(SafeOpaque, bytes).unwrap() // Opaque(Uint8Array([1, 2, 3]))
+const opaque = Readable.tryReadFromBytes(SafeOpaque, bytes).unwrap() // Opaque(Uint8Array([1, 2, 3]))
 const myobject = opaque.tryInto(MyObject).unwrap() // MyObject(1, 515)
 ```
 
 ```typescript
 const myobject = new MyObject(1, 515)
 const opaque = Opaque.tryFrom(myobject).unwrap() // Opaque(Uint8Array([1, 2, 3]))
-const bytes = Writable.toBytes(opaque).unwrap() // Uint8Array([1, 2, 3])
+const bytes = Writable.tryWriteToBytes(opaque).unwrap() // Uint8Array([1, 2, 3])
 ```
