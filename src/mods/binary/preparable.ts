@@ -14,6 +14,16 @@ export interface Preparable<T extends Writable = Writable> {
 
 }
 
+export class UnpreparedError extends Error {
+  readonly #class = UnpreparedError
+
+  constructor(
+    readonly name: string
+  ) {
+    super(`Unprepared ${name}`)
+  }
+}
+
 export namespace Preparable {
 
   /**
