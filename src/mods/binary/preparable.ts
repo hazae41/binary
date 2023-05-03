@@ -22,12 +22,7 @@ export namespace Preparable {
     * @returns 
     */
   export function tryPrepareToBytes(preparable: Preparable): Result<Bytes, Error> {
-    const writable = preparable.tryPrepare()
-
-    if (writable.isErr())
-      return writable
-
-    return Writable.tryWriteToBytes(writable.inner)
+    return preparable.tryPrepare().andThenSync(Writable.tryWriteToBytes)
   }
 
 }

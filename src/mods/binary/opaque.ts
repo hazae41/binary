@@ -1,5 +1,5 @@
 import { Bytes, Sized } from "@hazae41/bytes";
-import { Cursor, CursorReadOverflowError, CursorWriteOverflowError } from "@hazae41/cursor";
+import { Cursor, CursorReadLengthOverflowError, CursorWriteLengthOverflowError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 import { Readable } from "mods/binary/readable.js";
 import { Writable } from "./writable.js";
@@ -13,6 +13,10 @@ export class Opaque<T extends Bytes = Bytes> {
   constructor(
     readonly bytes: T
   ) { }
+
+  static new<T extends Bytes>(bytes: T) {
+    return new this(bytes)
+  }
 
   static empty() {
     return new this(Bytes.alloc(0))
@@ -42,7 +46,7 @@ export class Opaque<T extends Bytes = Bytes> {
     return new Ok(this.bytes.length)
   }
 
-  tryWrite(cursor: Cursor): Result<void, CursorWriteOverflowError> {
+  tryWrite(cursor: Cursor): Result<void, CursorWriteLengthOverflowError> {
     return cursor.tryWrite(this.bytes)
   }
 
@@ -61,12 +65,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @returns 
    */
   static tryFrom(writable: Writable): Result<Opaque, Error> {
-    const bytes = Writable.tryWriteToBytes(writable)
-
-    if (bytes.isErr())
-      return bytes
-
-    return new Ok(new this(bytes.inner))
+    return Writable.tryWriteToBytes(writable).mapSync(Opaque.new)
   }
 
 }
@@ -76,13 +75,8 @@ export class Opaque<T extends Bytes = Bytes> {
  */
 export namespace UnsafeOpaque {
 
-  export function tryRead(cursor: Cursor): Result<Opaque, CursorReadOverflowError> {
-    const bytes = cursor.tryRead(cursor.remaining)
-
-    if (bytes.isErr())
-      return bytes
-
-    return new Ok(new Opaque(bytes.inner))
+  export function tryRead(cursor: Cursor): Result<Opaque, CursorReadLengthOverflowError> {
+    return cursor.tryRead(cursor.remaining).mapSync(Opaque.new)
   }
 
 }
@@ -92,15 +86,8 @@ export namespace UnsafeOpaque {
  */
 export namespace SafeOpaque {
 
-  export function tryRead(cursor: Cursor): Result<Opaque, CursorReadOverflowError> {
-    const bytes = cursor.tryRead(cursor.remaining)
-
-    if (bytes.isErr())
-      return bytes
-
-    const copy = new Uint8Array(bytes.inner)
-
-    return new Ok(new Opaque(copy))
+  export function tryRead(cursor: Cursor): Result<Opaque, CursorReadLengthOverflowError> {
+    return cursor.tryRead(cursor.remaining).mapSync(Opaque.from)
   }
 
 }
