@@ -1,6 +1,6 @@
 import { Bytes } from "@hazae41/bytes";
 import { Result } from "@hazae41/result";
-import { Writable } from "mods/binary/writable.js";
+import { BinaryWriteUnderflowError, Writable } from "mods/binary/writable.js";
 
 /**
  * A preparable binary data type
@@ -21,7 +21,7 @@ export namespace Preparable {
     * @param writable 
     * @returns 
     */
-  export function tryPrepareToBytes(preparable: Preparable): Result<Bytes, Error> {
+  export function tryPrepareToBytes(preparable: Preparable): Result<Bytes, Error | BinaryWriteUnderflowError> {
     return preparable.tryPrepare().andThenSync(Writable.tryWriteToBytes)
   }
 
