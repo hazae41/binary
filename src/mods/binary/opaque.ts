@@ -1,8 +1,8 @@
 import { Bytes, Sized } from "@hazae41/bytes";
 import { Cursor, CursorReadLengthOverflowError, CursorWriteLengthOverflowError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
-import { Readable } from "mods/binary/readable.js";
-import { Writable } from "./writable.js";
+import { BinaryReadUnderflowError, Readable } from "mods/binary/readable.js";
+import { BinaryWriteUnderflowError, Writable } from "./writable.js";
 
 export class Opaque<T extends Bytes = Bytes> {
 
@@ -55,7 +55,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param readable 
    * @returns 
    */
-  tryInto<T>(readable: Readable<T>): Result<T, Error> {
+  tryInto<T>(readable: Readable<T>): Result<T, Error | BinaryReadUnderflowError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
@@ -64,7 +64,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param writable 
    * @returns 
    */
-  static tryFrom(writable: Writable): Result<Opaque, Error> {
+  static tryFrom(writable: Writable): Result<Opaque, Error | BinaryWriteUnderflowError> {
     return Writable.tryWriteToBytes(writable).mapSync(Opaque.new)
   }
 
