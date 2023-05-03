@@ -15,27 +15,27 @@ export class Opaque<T extends Bytes = Bytes> {
   ) { }
 
   static new<T extends Bytes>(bytes: T) {
-    return new this(bytes)
+    return new Opaque(bytes)
   }
 
   static empty() {
-    return new this(Bytes.alloc(0))
+    return new Opaque(Bytes.alloc(0))
   }
 
   static alloc<N extends number>(length: N) {
-    return new this(Bytes.alloc(length))
+    return new Opaque(Bytes.alloc(length))
   }
 
   static allocUnsafe<N extends number>(length: N) {
-    return new this(Bytes.allocUnsafe(length))
+    return new Opaque(Bytes.allocUnsafe(length))
   }
 
   static from<N extends number>(sized: Sized<number, N>) {
-    return new this(Bytes.from(sized))
+    return new Opaque(Bytes.from(sized))
   }
 
   static random<N extends number>(length: N) {
-    return new this(Bytes.random(length))
+    return new Opaque(Bytes.random(length))
   }
 
   tryPrepare(): Result<this, never> {

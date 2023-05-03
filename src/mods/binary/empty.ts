@@ -21,7 +21,7 @@ export class Empty {
   }
 
   static tryRead(cursor: Cursor): Result<Empty, never> {
-    return new Ok(new this())
+    return new Ok(new Empty())
   }
 
 }
