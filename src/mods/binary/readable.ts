@@ -14,6 +14,16 @@ export interface Readable<T> {
 
 }
 
+export class BinaryReadUnderflowError extends Error {
+  readonly #class = BinaryReadUnderflowError
+
+  constructor(
+    readonly cursor: Cursor
+  ) {
+    super(`Binary read got ${cursor.remaining} remaining bytes`)
+  }
+}
+
 export namespace Readable {
 
   /**
@@ -40,7 +50,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function tryReadFromBytes<T>(readable: Readable<T>, bytes: Uint8Array): Result<T, Error> {
+  export function tryReadFromBytes<T>(readable: Readable<T>, bytes: Uint8Array): Result<T, Error | BinaryReadUnderflowError> {
     const cursor = new Cursor(bytes)
     const result = readable.tryRead(cursor)
 
@@ -48,7 +58,7 @@ export namespace Readable {
       return result
 
     if (cursor.remaining)
-      return Err.error(`Readable.fromBytes got ${cursor.remaining} remaining bytes`)
+      return new Err(new BinaryReadUnderflowError(cursor))
 
     return result
   }

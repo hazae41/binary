@@ -20,6 +20,16 @@ export interface Writable {
 
 }
 
+export class BinaryWriteUnderflowError extends Error {
+  readonly #class = BinaryWriteUnderflowError
+
+  constructor(
+    readonly cursor: Cursor
+  ) {
+    super(`Binary write got ${cursor.remaining} remaining bytes`)
+  }
+}
+
 export namespace Writable {
 
   /**
@@ -27,7 +37,7 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes(writable: Writable): Result<Bytes, Error> {
+  export function tryWriteToBytes(writable: Writable): Result<Bytes, Error | BinaryWriteUnderflowError> {
     const size = writable.trySize()
 
     if (size.isErr())
@@ -40,7 +50,7 @@ export namespace Writable {
       return result
 
     if (cursor.remaining)
-      return Err.error(`Writable.toBytes got ${cursor.remaining} remaining bytes`)
+      return new Err(new BinaryWriteUnderflowError(cursor))
 
     return new Ok(cursor.bytes)
   }
