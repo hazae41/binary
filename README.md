@@ -34,12 +34,12 @@ class MyObject implements Writable {
   }
 
   write(cursor: Cursor): Result<void, Error> {
-    return Result.unthrowSync(() => {
+    return Result.unthrowSync<void, Error>(() => {
       cursor.tryWriteUint8(this.x).throw()
       cursor.tryWriteUint16(this.y).throw()
 
       return Ok.void()
-    }, Error)
+    })
   }
 
 }
@@ -61,7 +61,7 @@ class MyObject {
   ) {}
 
   static read(cursor: Cursor): Result<MyObject, Error> {
-    return Result.unthrowSync(() => {
+    return Result.unthrowSync<MyObject, Error>(() => {
       const x = cursor.tryReadUint8().throw()
       const y = cursor.tryReadUint16().throw()
 
