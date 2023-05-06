@@ -66,7 +66,7 @@ class MyObject {
       const y = cursor.tryReadUint16().throw()
 
       return new Ok(new this(x, y))
-    }, Error)
+    })
   }
 
 }
