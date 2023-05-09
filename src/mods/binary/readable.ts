@@ -4,13 +4,13 @@ import { Err, Result } from "@hazae41/result";
 /**
  * A readable binary data type
  */
-export interface Readable<T> {
+export interface Readable<Output, Error> {
 
   /**
    * Read bytes from a cursor
    * @param cursor 
    */
-  tryRead(cursor: Cursor): Result<T, Error>
+  tryRead(cursor: Cursor): Result<Output, Error>
 
 }
 
@@ -34,7 +34,7 @@ export namespace Readable {
    * @param cursor 
    * @returns 
    */
-  export function tryReadOrRollback<T>(readable: Readable<T>, cursor: Cursor): Result<T, Error> {
+  export function tryReadOrRollback<Output, Error>(readable: Readable<Output, Error>, cursor: Cursor): Result<Output, Error> {
     const offset = cursor.offset
     const result = readable.tryRead(cursor)
 
@@ -50,7 +50,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function tryReadFromBytes<T>(readable: Readable<T>, bytes: Uint8Array): Result<T, Error | BinaryReadUnderflowError> {
+  export function tryReadFromBytes<Output, Error>(readable: Readable<Output, Error>, bytes: Uint8Array): Result<Output, Error | BinaryReadUnderflowError> {
     const cursor = new Cursor(bytes)
     const result = readable.tryRead(cursor)
 

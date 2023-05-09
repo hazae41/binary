@@ -55,7 +55,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param readable 
    * @returns 
    */
-  tryInto<T>(readable: Readable<T>): Result<T, Error | BinaryReadUnderflowError> {
+  tryInto<Output, Error>(readable: Readable<Output, Error>): Result<Output, Error | BinaryReadUnderflowError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
@@ -64,7 +64,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param writable 
    * @returns 
    */
-  static tryFrom(writable: Writable): Result<Opaque, Error | BinaryWriteUnderflowError> {
+  static tryFrom<SizeError, WriteError>(writable: Writable<SizeError, WriteError>): Result<Opaque, SizeError | WriteError | BinaryWriteUnderflowError> {
     return Writable.tryWriteToBytes(writable).mapSync(Opaque.new)
   }
 

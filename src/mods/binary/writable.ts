@@ -5,18 +5,18 @@ import { Err, Ok, Result } from "@hazae41/result"
 /**
  * A writable binary data type
  */
-export interface Writable {
+export interface Writable<SizeError = unknown, WriteError = unknown> {
 
   /**
    * Get the amount of bytes
    */
-  trySize(): Result<number, Error>
+  trySize(): Result<number, SizeError>
 
   /**
    * Write bytes to a cursor
    * @param cursor 
    */
-  tryWrite(cursor: Cursor): Result<void, Error>
+  tryWrite(cursor: Cursor): Result<void, WriteError>
 
 }
 
@@ -37,7 +37,7 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes(writable: Writable): Result<Bytes, Error | BinaryWriteUnderflowError> {
+  export function tryWriteToBytes<SizeError, WriteError>(writable: Writable<SizeError, WriteError>): Result<Bytes, SizeError | WriteError | BinaryWriteUnderflowError> {
     const size = writable.trySize()
 
     if (size.isErr())
