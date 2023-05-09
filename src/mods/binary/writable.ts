@@ -1,4 +1,3 @@
-import { Bytes } from "@hazae41/bytes"
 import { Cursor } from "@hazae41/cursor"
 import { Err, Ok, Result } from "@hazae41/result"
 
@@ -37,7 +36,7 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes<SizeError, WriteError>(writable: Writable<SizeError, WriteError>): Result<Bytes, SizeError | WriteError | BinaryWriteUnderflowError> {
+  export function tryWriteToBytes<SizeError, WriteError>(writable: Writable<SizeError, WriteError>) {
     const size = writable.trySize()
 
     if (size.isErr())

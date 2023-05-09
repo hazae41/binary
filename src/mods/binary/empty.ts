@@ -1,5 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result } from "@hazae41/result";
+import { Ok } from "@hazae41/result";
 
 export class Empty {
 
@@ -8,19 +8,19 @@ export class Empty {
    */
   constructor() { }
 
-  tryPrepare(): Result<this, never> {
+  tryPrepare() {
     return new Ok(this)
   }
 
-  trySize(): Result<number, never> {
+  trySize() {
     return new Ok(0)
   }
 
-  tryWrite(cursor: Cursor): Result<void, never> {
+  tryWrite(cursor: Cursor) {
     return Ok.void()
   }
 
-  static tryRead(cursor: Cursor): Result<Empty, never> {
+  static tryRead(cursor: Cursor) {
     return new Ok(new Empty())
   }
 
