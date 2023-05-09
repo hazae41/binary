@@ -4,7 +4,7 @@ import { Err, Result } from "@hazae41/result";
 /**
  * A readable binary data type
  */
-export interface Readable<Output, Error> {
+export interface Readable<Output = unknown, Error = unknown> {
 
   /**
    * Read bytes from a cursor
