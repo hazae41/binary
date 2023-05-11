@@ -31,6 +31,10 @@ export class BinaryWriteUnderflowError extends Error {
 
 export namespace Writable {
 
+  export type SizeError<T extends Writable> = T extends Writable<infer SizeError, unknown> ? SizeError : never
+
+  export type WriteError<T extends Writable> = T extends Writable<unknown, infer WriteError> ? WriteError : never
+
   /**
    * Write a binary data type to bytes
    * @param writable 

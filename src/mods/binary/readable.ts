@@ -4,13 +4,13 @@ import { Err, Result } from "@hazae41/result";
 /**
  * A readable binary data type
  */
-export interface Readable<Output = unknown, Error = unknown> {
+export interface Readable<ReadOutput = unknown, ReadError = unknown> {
 
   /**
    * Read bytes from a cursor
    * @param cursor 
    */
-  tryRead(cursor: Cursor): Result<Output, Error>
+  tryRead(cursor: Cursor): Result<ReadOutput, ReadError>
 
 }
 
@@ -26,6 +26,10 @@ export class BinaryReadUnderflowError extends Error {
 
 export namespace Readable {
 
+  export type ReadOutput<T extends Readable> = T extends Readable<infer ReadOutput, unknown> ? ReadOutput : never
+
+  export type ReadError<T extends Readable> = T extends Readable<unknown, infer ReadError> ? ReadError : never
+
   /**
    * Try to read a binary data type from a cursor
    * - on Ok: returns the Ok containing the BDT
@@ -34,7 +38,7 @@ export namespace Readable {
    * @param cursor 
    * @returns 
    */
-  export function tryReadOrRollback<Output, Error>(readable: Readable<Output, Error>, cursor: Cursor): Result<Output, Error> {
+  export function tryReadOrRollback<ReadOutput, ReadError>(readable: Readable<ReadOutput, ReadError>, cursor: Cursor): Result<ReadOutput, ReadError> {
     const offset = cursor.offset
     const result = readable.tryRead(cursor)
 
@@ -50,7 +54,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function tryReadFromBytes<Output, Error>(readable: Readable<Output, Error>, bytes: Uint8Array): Result<Output, Error | BinaryReadUnderflowError> {
+  export function tryReadFromBytes<ReadOutput, ReadError>(readable: Readable<ReadOutput, ReadError>, bytes: Uint8Array): Result<ReadOutput, ReadError | BinaryReadUnderflowError> {
     const cursor = new Cursor(bytes)
     const result = readable.tryRead(cursor)
 

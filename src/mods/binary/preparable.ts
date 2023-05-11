@@ -5,12 +5,12 @@ import { BinaryWriteUnderflowError, Writable } from "mods/binary/writable.js";
 /**
  * A preparable binary data type
  */
-export interface Preparable<Output extends Writable = Writable, Error = unknown> {
+export interface Preparable<PrepareOutput extends Writable = Writable, PrepareError = unknown> {
 
   /**
    * Prepare to a writable
    */
-  tryPrepare(): Result<Output, Error>
+  tryPrepare(): Result<PrepareOutput, PrepareError>
 
 }
 
@@ -25,6 +25,10 @@ export class UnpreparedError extends Error {
 }
 
 export namespace Preparable {
+
+  export type PrepareOutput<T extends Preparable> = T extends Preparable<infer PrepareOutput, unknown> ? PrepareOutput : never
+
+  export type PrepareError<T extends Preparable> = T extends Preparable<Writable, infer PrepareError> ? PrepareError : never
 
   /**
     * Write a binary data type to bytes

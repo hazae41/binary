@@ -55,7 +55,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param readable 
    * @returns 
    */
-  tryInto<Output, Error>(readable: Readable<Output, Error>): Result<Output, Error | BinaryReadUnderflowError> {
+  tryInto<ReadOutput, ReadError>(readable: Readable<ReadOutput, ReadError>): Result<ReadOutput, ReadError | BinaryReadUnderflowError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
