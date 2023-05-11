@@ -1,3 +1,4 @@
+import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Err, Result } from "@hazae41/result";
 
@@ -7,10 +8,10 @@ import { Err, Result } from "@hazae41/result";
 export interface Readable<ReadOutput = unknown, ReadError = unknown> {
 
   /**
-   * Read bytes from a cursor
+   * Read from a cursor
    * @param cursor 
    */
-  tryRead(cursor: Cursor): Result<ReadOutput, ReadError>
+  tryRead(cursor: Cursor): Result<Readable.ReadOutput<this>, Readable.ReadError<this>>
 
 }
 
@@ -20,7 +21,7 @@ export class BinaryReadUnderflowError extends Error {
   constructor(
     readonly cursor: Cursor
   ) {
-    super(`Binary read got ${cursor.remaining} remaining bytes`)
+    super(`Cursor has ${cursor.remaining} remaining bytes after read`)
   }
 }
 
@@ -38,7 +39,7 @@ export namespace Readable {
    * @param cursor 
    * @returns 
    */
-  export function tryReadOrRollback<ReadOutput, ReadError>(readable: Readable<ReadOutput, ReadError>, cursor: Cursor): Result<ReadOutput, ReadError> {
+  export function tryReadOrRollback<T extends Readable>(readable: T, cursor: Cursor): Result<ReadOutput<T>, ReadError<T>> {
     const offset = cursor.offset
     const result = readable.tryRead(cursor)
 
@@ -49,12 +50,14 @@ export namespace Readable {
   }
 
   /**
-   * Read a binary data type from bytes
+   * Read from bytes and check for underflow
+   * 
+   * Underflow is when the cursor has remaining bytes; meaning we read less bytes than the expected length
    * @param readable 
    * @param bytes 
    * @returns 
    */
-  export function tryReadFromBytes<ReadOutput, ReadError>(readable: Readable<ReadOutput, ReadError>, bytes: Uint8Array): Result<ReadOutput, ReadError | BinaryReadUnderflowError> {
+  export function tryReadFromBytes<T extends Readable>(readable: T, bytes: Bytes): Result<ReadOutput<T>, ReadError<T> | BinaryReadUnderflowError> {
     const cursor = new Cursor(bytes)
     const result = readable.tryRead(cursor)
 

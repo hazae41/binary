@@ -7,15 +7,15 @@ import { Err, Ok, Result } from "@hazae41/result"
 export interface Writable<SizeError = unknown, WriteError = unknown> {
 
   /**
-   * Get the amount of bytes
+   * Compute the amount of bytes to allocate
    */
-  trySize(): Result<number, SizeError>
+  trySize(): Result<number, Writable.SizeError<this>>
 
   /**
-   * Write bytes to a cursor
+   * Write to a cursor
    * @param cursor 
    */
-  tryWrite(cursor: Cursor): Result<void, WriteError>
+  tryWrite(cursor: Cursor): Result<void, Writable.WriteError<this>>
 
 }
 
@@ -25,7 +25,7 @@ export class BinaryWriteUnderflowError extends Error {
   constructor(
     readonly cursor: Cursor
   ) {
-    super(`Binary write got ${cursor.remaining} remaining bytes`)
+    super(`Cursor has ${cursor.remaining} remaining bytes after write`)
   }
 }
 
@@ -36,11 +36,13 @@ export namespace Writable {
   export type WriteError<T extends Writable> = T extends Writable<unknown, infer WriteError> ? WriteError : never
 
   /**
-   * Write a binary data type to bytes
+   * Write to bytes and check for underflow
+   * 
+   * Underflow is when the cursor has remaining bytes; meaning we have written less bytes than allocated
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes<SizeError, WriteError>(writable: Writable<SizeError, WriteError>) {
+  export function tryWriteToBytes<T extends Writable>(writable: T) {
     const size = writable.trySize()
 
     if (size.isErr())
