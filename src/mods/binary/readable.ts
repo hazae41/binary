@@ -1,20 +1,7 @@
 import { Bytes } from "@hazae41/bytes";
-import { Cursor, CursorReadError } from "@hazae41/cursor";
+import { Cursor } from "@hazae41/cursor";
 import { Err, Result } from "@hazae41/result";
-
-export type BinaryReadError =
-  | BinaryReadUnderflowError
-  | CursorReadError
-
-export class BinaryReadUnderflowError extends Error {
-  readonly #class = BinaryReadUnderflowError
-
-  constructor(
-    readonly cursor: Cursor
-  ) {
-    super(`Cursor has ${cursor.remaining} remaining bytes after read`)
-  }
-}
+import { CursorReadLengthUnderflowError } from "./errors.js";
 
 /**
  * A readable binary data type
@@ -61,7 +48,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function tryReadFromBytes<T extends Readable>(readable: T, bytes: Bytes): Result<ReadOutput<T>, ReadError<T> | BinaryReadUnderflowError> {
+  export function tryReadFromBytes<T extends Readable>(readable: T, bytes: Bytes): Result<ReadOutput<T>, ReadError<T> | CursorReadLengthUnderflowError> {
     const cursor = new Cursor(bytes)
     const result = readable.tryRead(cursor)
 
@@ -69,7 +56,7 @@ export namespace Readable {
       return result
 
     if (cursor.remaining)
-      return new Err(new BinaryReadUnderflowError(cursor))
+      return new Err(new CursorReadLengthUnderflowError(cursor))
 
     return result
   }

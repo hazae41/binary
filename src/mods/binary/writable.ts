@@ -1,20 +1,7 @@
 import { Bytes } from "@hazae41/bytes"
-import { Cursor, CursorWriteError } from "@hazae41/cursor"
+import { Cursor } from "@hazae41/cursor"
 import { Err, Ok, Result } from "@hazae41/result"
-
-export type BinaryWriteError =
-  | BinaryWriteUnderflowError
-  | CursorWriteError
-
-export class BinaryWriteUnderflowError extends Error {
-  readonly #class = BinaryWriteUnderflowError
-
-  constructor(
-    readonly cursor: Cursor
-  ) {
-    super(`Cursor has ${cursor.remaining} remaining bytes after write`)
-  }
-}
+import { CursorWriteLenghtUnderflowError } from "./errors.js"
 
 /**
  * A writable binary data type
@@ -47,7 +34,7 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes<T extends Writable>(writable: T): Result<Bytes, SizeError<T> | WriteError<T> | BinaryWriteUnderflowError> {
+  export function tryWriteToBytes<T extends Writable>(writable: T): Result<Bytes, SizeError<T> | WriteError<T> | CursorWriteLenghtUnderflowError> {
     const size = writable.trySize()
 
     if (size.isErr())
@@ -60,7 +47,7 @@ export namespace Writable {
       return result
 
     if (cursor.remaining)
-      return new Err(new BinaryWriteUnderflowError(cursor))
+      return new Err(new CursorWriteLenghtUnderflowError(cursor))
 
     return new Ok(cursor.bytes)
   }

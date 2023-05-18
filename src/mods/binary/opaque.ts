@@ -1,8 +1,9 @@
 import { Bytes, Sized } from "@hazae41/bytes";
 import { Cursor, CursorReadLengthOverflowError, CursorWriteLengthOverflowError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
-import { BinaryReadUnderflowError, Readable } from "mods/binary/readable.js";
-import { BinaryWriteUnderflowError, Writable } from "./writable.js";
+import { Readable } from "mods/binary/readable.js";
+import { CursorReadLengthUnderflowError, CursorWriteLenghtUnderflowError } from "./errors.js";
+import { Writable } from "./writable.js";
 
 export class Opaque<T extends Bytes = Bytes> {
 
@@ -55,7 +56,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param readable 
    * @returns 
    */
-  tryInto<T extends Readable>(readable: T): Result<Readable.ReadOutput<T>, Readable.ReadError<T> | BinaryReadUnderflowError> {
+  tryInto<T extends Readable>(readable: T): Result<Readable.ReadOutput<T>, Readable.ReadError<T> | CursorReadLengthUnderflowError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
@@ -64,7 +65,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param writable 
    * @returns 
    */
-  static tryFrom<T extends Writable>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteUnderflowError> {
+  static tryFrom<T extends Writable>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
     return Writable.tryWriteToBytes(writable).mapSync(Opaque.new)
   }
 
@@ -75,8 +76,24 @@ export class Opaque<T extends Bytes = Bytes> {
  */
 export namespace UnsafeOpaque {
 
+  /**
+   * Unsafe zero-copy read remaining bytes from cursor
+   * @param cursor 
+   * @returns 
+   */
   export function tryRead(cursor: Cursor): Result<Opaque, CursorReadLengthOverflowError> {
     return cursor.tryRead(cursor.remaining).mapSync(Opaque.new)
+  }
+
+  /**
+   * Perform unsafe zero-copy conversion to `Opaque` if `T instanceof Opaque`, else use `Opaque.tryFrom`
+   * @param writable 
+   * @returns 
+   */
+  export function tryFrom<T extends Writable>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
+    if (writable instanceof Opaque)
+      return new Ok(Opaque.new(writable.bytes))
+    return Opaque.tryFrom(writable)
   }
 
 }
@@ -86,8 +103,23 @@ export namespace UnsafeOpaque {
  */
 export namespace SafeOpaque {
 
+  /**
+   * Safe copy read remaining bytes from cursor
+   * @param cursor 
+   * @returns 
+   */
   export function tryRead(cursor: Cursor): Result<Opaque, CursorReadLengthOverflowError> {
     return cursor.tryRead(cursor.remaining).mapSync(Opaque.from)
   }
+
+  /**
+   * Perform safe, copy conversion to `Opaque` using `Opaque.tryFrom`
+   * @param writable 
+   * @returns 
+   */
+  export function tryFrom<T extends Writable>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
+    return Opaque.tryFrom(writable)
+  }
+
 
 }
