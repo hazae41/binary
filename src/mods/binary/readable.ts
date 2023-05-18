@@ -1,6 +1,20 @@
 import { Bytes } from "@hazae41/bytes";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadError } from "@hazae41/cursor";
 import { Err, Result } from "@hazae41/result";
+
+export type BinaryReadError =
+  | BinaryReadUnderflowError
+  | CursorReadError
+
+export class BinaryReadUnderflowError extends Error {
+  readonly #class = BinaryReadUnderflowError
+
+  constructor(
+    readonly cursor: Cursor
+  ) {
+    super(`Cursor has ${cursor.remaining} remaining bytes after read`)
+  }
+}
 
 /**
  * A readable binary data type
@@ -13,16 +27,6 @@ export interface Readable<ReadOutput = unknown, ReadError = unknown> {
    */
   tryRead(cursor: Cursor): Result<Readable.ReadOutput<this>, Readable.ReadError<this>>
 
-}
-
-export class BinaryReadUnderflowError extends Error {
-  readonly #class = BinaryReadUnderflowError
-
-  constructor(
-    readonly cursor: Cursor
-  ) {
-    super(`Cursor has ${cursor.remaining} remaining bytes after read`)
-  }
 }
 
 export namespace Readable {

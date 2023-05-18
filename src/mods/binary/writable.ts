@@ -1,6 +1,20 @@
 import { Bytes } from "@hazae41/bytes"
-import { Cursor } from "@hazae41/cursor"
+import { Cursor, CursorWriteError } from "@hazae41/cursor"
 import { Err, Ok, Result } from "@hazae41/result"
+
+export type BinaryWriteError =
+  | BinaryWriteUnderflowError
+  | CursorWriteError
+
+export class BinaryWriteUnderflowError extends Error {
+  readonly #class = BinaryWriteUnderflowError
+
+  constructor(
+    readonly cursor: Cursor
+  ) {
+    super(`Cursor has ${cursor.remaining} remaining bytes after write`)
+  }
+}
 
 /**
  * A writable binary data type
@@ -18,16 +32,6 @@ export interface Writable<SizeError = unknown, WriteError = unknown> {
    */
   tryWrite(cursor: Cursor): Result<void, Writable.WriteError<this>>
 
-}
-
-export class BinaryWriteUnderflowError extends Error {
-  readonly #class = BinaryWriteUnderflowError
-
-  constructor(
-    readonly cursor: Cursor
-  ) {
-    super(`Cursor has ${cursor.remaining} remaining bytes after write`)
-  }
 }
 
 export namespace Writable {
