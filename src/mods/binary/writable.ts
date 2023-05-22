@@ -35,21 +35,16 @@ export namespace Writable {
    * @returns 
    */
   export function tryWriteToBytes<T extends Writable>(writable: T): Result<Bytes, SizeError<T> | WriteError<T> | CursorWriteLenghtUnderflowError> {
-    const size = writable.trySize()
+    return Result.unthrowSync(t => {
+      const size = writable.trySize().throw(t)
+      const cursor = Cursor.allocUnsafe(size)
+      writable.tryWrite(cursor).throw(t)
 
-    if (size.isErr())
-      return size
+      if (cursor.remaining)
+        return new Err(new CursorWriteLenghtUnderflowError(cursor))
 
-    const cursor = Cursor.allocUnsafe(size.inner)
-    const result = writable.tryWrite(cursor)
-
-    if (result.isErr())
-      return result
-
-    if (cursor.remaining)
-      return new Err(new CursorWriteLenghtUnderflowError(cursor))
-
-    return new Ok(cursor.bytes)
+      return new Ok(cursor.bytes)
+    })
   }
 
 }

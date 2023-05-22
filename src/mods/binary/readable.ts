@@ -1,6 +1,6 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Result } from "@hazae41/result";
+import { Err, Ok, Result } from "@hazae41/result";
 import { CursorReadLengthUnderflowError } from "./errors.js";
 
 /**
@@ -49,16 +49,15 @@ export namespace Readable {
    * @returns 
    */
   export function tryReadFromBytes<T extends Readable>(readable: T, bytes: Bytes): Result<ReadOutput<T>, ReadError<T> | CursorReadLengthUnderflowError> {
-    const cursor = new Cursor(bytes)
-    const result = readable.tryRead(cursor)
+    return Result.unthrowSync(t => {
+      const cursor = new Cursor(bytes)
+      const output = readable.tryRead(cursor).throw(t)
 
-    if (result.isErr())
-      return result
+      if (cursor.remaining)
+        return new Err(new CursorReadLengthUnderflowError(cursor))
 
-    if (cursor.remaining)
-      return new Err(new CursorReadLengthUnderflowError(cursor))
-
-    return result
+      return new Ok(output)
+    })
   }
 
 }
