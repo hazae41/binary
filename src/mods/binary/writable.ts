@@ -11,17 +11,19 @@ export interface Writable<SizeError = unknown, WriteError = unknown> {
   /**
    * Compute the amount of bytes to allocate
    */
-  trySize(): Result<number, Writable.SizeError<this>>
+  trySize(): Result<number, SizeError>
 
   /**
    * Write to a cursor
    * @param cursor 
    */
-  tryWrite(cursor: Cursor): Result<void, Writable.WriteError<this>>
+  tryWrite(cursor: Cursor): Result<void, WriteError>
 
 }
 
 export namespace Writable {
+
+  export type Infer<T extends Writable> = Writable<SizeError<T>, WriteError<T>>
 
   export type SizeError<T extends Writable> = T extends Writable<infer SizeError, unknown> ? SizeError : never
 
@@ -34,7 +36,7 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes<T extends Writable>(writable: T): Result<Bytes, SizeError<T> | WriteError<T> | CursorWriteLenghtUnderflowError> {
+  export function tryWriteToBytes<T extends Writable>(writable: Infer<T>): Result<Bytes, SizeError<T> | WriteError<T> | CursorWriteLenghtUnderflowError> {
     return Result.unthrowSync(t => {
       const size = writable.trySize().throw(t)
       const cursor = Cursor.allocUnsafe(size)

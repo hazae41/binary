@@ -12,15 +12,21 @@ export interface Readable<ReadOutput = unknown, ReadError = unknown> {
    * Read from a cursor
    * @param cursor 
    */
-  tryRead(cursor: Cursor): Result<Readable.ReadOutput<this>, Readable.ReadError<this>>
+  tryRead(cursor: Cursor): Result<ReadOutput, ReadError>
 
 }
 
 export namespace Readable {
 
+  export type Infer<T extends Readable> = Readable<Readable.ReadOutput<T>, Readable.ReadError<T>>
+
   export type ReadOutput<T extends Readable> = T extends Readable<infer ReadOutput, unknown> ? ReadOutput : never
 
   export type ReadError<T extends Readable> = T extends Readable<unknown, infer ReadError> ? ReadError : never
+
+  export function tryRead<T extends Readable>(readable: Infer<T>, cursor: Cursor): Result<ReadOutput<T>, ReadError<T>> {
+    return readable.tryRead(cursor)
+  }
 
   /**
    * Try to read a binary data type from a cursor
@@ -30,7 +36,7 @@ export namespace Readable {
    * @param cursor 
    * @returns 
    */
-  export function tryReadOrRollback<T extends Readable>(readable: T, cursor: Cursor): Result<ReadOutput<T>, ReadError<T>> {
+  export function tryReadOrRollback<T extends Infer<T>>(readable: T, cursor: Cursor): Result<ReadOutput<T>, ReadError<T>> {
     const offset = cursor.offset
     const result = readable.tryRead(cursor)
 
@@ -48,7 +54,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function tryReadFromBytes<T extends Readable>(readable: T, bytes: Bytes): Result<ReadOutput<T>, ReadError<T> | CursorReadLengthUnderflowError> {
+  export function tryReadFromBytes<T extends Infer<T>>(readable: T, bytes: Bytes): Result<ReadOutput<T>, ReadError<T> | CursorReadLengthUnderflowError> {
     return Result.unthrowSync(t => {
       const cursor = new Cursor(bytes)
       const output = readable.tryRead(cursor).throw(t)

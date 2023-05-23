@@ -56,7 +56,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param readable 
    * @returns 
    */
-  tryInto<T extends Readable>(readable: T): Result<Readable.ReadOutput<T>, Readable.ReadError<T> | CursorReadLengthUnderflowError> {
+  tryInto<T extends Readable.Infer<T>>(readable: T): Result<Readable.ReadOutput<T>, Readable.ReadError<T> | CursorReadLengthUnderflowError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
@@ -65,7 +65,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param writable 
    * @returns 
    */
-  static tryFrom<T extends Writable>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
+  static tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
     return Writable.tryWriteToBytes(writable).mapSync(Opaque.new)
   }
 
@@ -90,7 +90,7 @@ export namespace UnsafeOpaque {
    * @param writable 
    * @returns 
    */
-  export function tryFrom<T extends Writable>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
+  export function tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
     if (writable instanceof Opaque)
       return new Ok(Opaque.new(writable.bytes))
     return Opaque.tryFrom(writable)
@@ -117,7 +117,7 @@ export namespace SafeOpaque {
    * @param writable 
    * @returns 
    */
-  export function tryFrom<T extends Writable>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
+  export function tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
     return Opaque.tryFrom(writable)
   }
 

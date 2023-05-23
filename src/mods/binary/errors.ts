@@ -10,6 +10,7 @@ export type BinaryReadError =
 
 export class CursorReadLengthUnderflowError extends Error {
   readonly #class = CursorReadLengthUnderflowError
+  readonly name = this.#class.name
 
   constructor(
     readonly cursor: Cursor
@@ -24,6 +25,7 @@ export type BinaryWriteError =
 
 export class CursorWriteLenghtUnderflowError extends Error {
   readonly #class = CursorWriteLenghtUnderflowError
+  readonly name = this.#class.name
 
   constructor(
     readonly cursor: Cursor
