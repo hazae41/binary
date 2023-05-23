@@ -24,10 +24,6 @@ export namespace Readable {
 
   export type ReadError<T extends Readable> = T extends Readable<unknown, infer ReadError> ? ReadError : never
 
-  export function tryRead<T extends Readable>(readable: Infer<T>, cursor: Cursor): Result<ReadOutput<T>, ReadError<T>> {
-    return readable.tryRead(cursor)
-  }
-
   /**
    * Try to read a binary data type from a cursor
    * - on Ok: returns the Ok containing the BDT
