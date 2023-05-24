@@ -36,7 +36,7 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes<T extends Writable>(writable: Infer<T>): Result<Bytes, SizeError<T> | WriteError<T> | CursorWriteLenghtUnderflowError> {
+  export function tryWriteToBytes<T extends Writable.Infer<T>>(writable: T): Result<Bytes, SizeError<T> | WriteError<T> | CursorWriteLenghtUnderflowError> {
     return Result.unthrowSync(t => {
       const size = writable.trySize().throw(t)
       const cursor = Cursor.allocUnsafe(size)
