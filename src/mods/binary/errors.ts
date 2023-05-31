@@ -1,3 +1,4 @@
+import { BytesAllocError, BytesCastError } from "@hazae41/bytes"
 import { Cursor, CursorReadError, CursorWriteError } from "@hazae41/cursor"
 
 export type BinaryError =
@@ -5,6 +6,7 @@ export type BinaryError =
   | BinaryWriteError
 
 export type BinaryReadError =
+  | BytesCastError
   | CursorReadLengthUnderflowError
   | CursorReadError
 
@@ -20,6 +22,7 @@ export class CursorReadLengthUnderflowError extends Error {
 }
 
 export type BinaryWriteError =
+  | BytesAllocError
   | CursorWriteLenghtUnderflowError
   | CursorWriteError
 

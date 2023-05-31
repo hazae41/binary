@@ -1,7 +1,7 @@
 import { Bytes } from "@hazae41/bytes"
 import { Cursor } from "@hazae41/cursor"
 import { Err, Ok, Result } from "@hazae41/result"
-import { CursorWriteLenghtUnderflowError } from "./errors.js"
+import { BinaryWriteError, CursorWriteLenghtUnderflowError } from "./errors.js"
 
 /**
  * A writable binary data type
@@ -36,10 +36,12 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes<T extends Writable.Infer<T>>(writable: T): Result<Bytes, SizeError<T> | WriteError<T> | CursorWriteLenghtUnderflowError> {
+  export function tryWriteToBytes<T extends Writable.Infer<T>>(writable: T): Result<Bytes, SizeError<T> | WriteError<T> | BinaryWriteError> {
     return Result.unthrowSync(t => {
       const size = writable.trySize().throw(t)
-      const cursor = Cursor.allocUnsafe(size)
+      const bytes = Bytes.tryAllocUnsafe(size).throw(t)
+
+      const cursor = new Cursor(bytes)
       writable.tryWrite(cursor).throw(t)
 
       if (cursor.remaining)

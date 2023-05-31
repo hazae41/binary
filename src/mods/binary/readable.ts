@@ -1,7 +1,7 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
-import { CursorReadLengthUnderflowError } from "./errors.js";
+import { BinaryReadError, CursorReadLengthUnderflowError } from "./errors.js";
 
 /**
  * A readable binary data type
@@ -50,7 +50,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function tryReadFromBytes<T extends Infer<T>>(readable: T, bytes: Bytes): Result<ReadOutput<T>, ReadError<T> | CursorReadLengthUnderflowError> {
+  export function tryReadFromBytes<T extends Infer<T>>(readable: T, bytes: Bytes): Result<ReadOutput<T>, ReadError<T> | BinaryReadError> {
     return Result.unthrowSync(t => {
       const cursor = new Cursor(bytes)
       const output = readable.tryRead(cursor).throw(t)

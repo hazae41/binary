@@ -1,8 +1,8 @@
-import { Bytes, Sized } from "@hazae41/bytes";
-import { Cursor, CursorReadLengthOverflowError, CursorWriteLengthOverflowError } from "@hazae41/cursor";
+import { Bytes, BytesAllocError, Sized } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 import { Readable } from "mods/binary/readable.js";
-import { CursorReadLengthUnderflowError, CursorWriteLenghtUnderflowError } from "./errors.js";
+import { BinaryReadError, BinaryWriteError } from "./errors.js";
 import { Writable } from "./writable.js";
 
 export class Opaque<T extends Bytes = Bytes> {
@@ -19,35 +19,113 @@ export class Opaque<T extends Bytes = Bytes> {
     return new Opaque(bytes)
   }
 
+  /**
+   * Bytes.empty
+   * @deprecated
+   * @returns 
+   */
   static empty() {
     return new Opaque(Bytes.alloc(0))
   }
 
+  /**
+   * Bytes.tryEmpty
+   * @returns 
+   */
+  static tryEmpty(): Result<Opaque<Bytes<0>>, BytesAllocError<0>> {
+    return Bytes.tryEmpty().mapSync(Opaque.new)
+  }
+
+  /**
+   * Bytes.alloc
+   * @deprecated
+   * @param length 
+   * @returns 
+   */
   static alloc<N extends number>(length: N) {
     return new Opaque(Bytes.alloc(length))
   }
 
+  /**
+   * Bytes.tryAlloc
+   * @param length 
+   * @returns 
+   */
+  static tryAlloc<N extends number>(length: N): Result<Opaque<Bytes<N>>, BytesAllocError<N>> {
+    return Bytes.tryAlloc(length).mapSync(Opaque.new)
+  }
+
+  /**
+   * Bytes.allocUnsafe
+   * @deprecated
+   * @param length 
+   * @returns 
+   */
   static allocUnsafe<N extends number>(length: N) {
     return new Opaque(Bytes.allocUnsafe(length))
   }
 
+  /**
+   * Bytes.tryAllocUnsafe
+   * @param length 
+   * @returns 
+   */
+  static tryAllocUnsafe<N extends number>(length: N): Result<Opaque<Bytes<N>>, BytesAllocError<N>> {
+    return Bytes.tryAllocUnsafe(length).mapSync(Opaque.new)
+  }
+
+  /**
+   * Bytes.from
+   * @deprecated
+   * @param sized 
+   * @returns 
+   */
   static from<N extends number>(sized: Sized<number, N>) {
     return new Opaque(Bytes.from(sized))
   }
 
+  /**
+   * Bytes.tryFrom
+   * @param sized 
+   * @returns 
+   */
+  static tryFrom<N extends number>(sized: Sized<number, N>): Result<Opaque<Bytes<N>>, BytesAllocError<N>> {
+    return Bytes.tryFrom(sized).mapSync(Opaque.new)
+  }
+
+  /**
+   * Bytes.random
+   * @deprecated
+   * @param length 
+   * @returns 
+   */
   static random<N extends number>(length: N) {
     return new Opaque(Bytes.random(length))
   }
 
-  tryPrepare(): Result<this, never> {
-    return new Ok(this)
+  /**
+   * Bytes.tryRandom
+   * @param length 
+   * @returns 
+   */
+  static tryRandom<N extends number>(length: N): Result<Opaque<Bytes<N>>, BytesAllocError<N>> {
+    return Bytes.tryRandom(length).mapSync(Opaque.new)
   }
 
+  /**
+   * Size this
+   * @returns 
+   */
   trySize(): Result<number, never> {
     return new Ok(this.bytes.length)
   }
 
-  tryWrite(cursor: Cursor): Result<void, CursorWriteLengthOverflowError> {
+  /**
+   * Write this
+   * @param cursor 
+   * @returns 
+   */
+  tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
     return cursor.tryWrite(this.bytes)
   }
 
@@ -56,7 +134,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param readable 
    * @returns 
    */
-  tryInto<T extends Readable.Infer<T>>(readable: T): Result<Readable.ReadOutput<T>, Readable.ReadError<T> | CursorReadLengthUnderflowError> {
+  tryReadInto<T extends Readable.Infer<T>>(readable: T): Result<Readable.ReadOutput<T>, Readable.ReadError<T> | BinaryReadError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
@@ -65,7 +143,7 @@ export class Opaque<T extends Bytes = Bytes> {
    * @param writable 
    * @returns 
    */
-  static tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
+  static tryWriteFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
     return Writable.tryWriteToBytes(writable).mapSync(Opaque.new)
   }
 
@@ -81,7 +159,7 @@ export namespace UnsafeOpaque {
    * @param cursor 
    * @returns 
    */
-  export function tryRead(cursor: Cursor): Result<Opaque, CursorReadLengthOverflowError> {
+  export function tryRead(cursor: Cursor): Result<Opaque, BinaryReadError> {
     return cursor.tryRead(cursor.remaining).mapSync(Opaque.new)
   }
 
@@ -90,10 +168,10 @@ export namespace UnsafeOpaque {
    * @param writable 
    * @returns 
    */
-  export function tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
+  export function tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
     if (writable instanceof Opaque)
-      return new Ok(Opaque.new(writable.bytes))
-    return Opaque.tryFrom(writable)
+      return new Ok(writable)
+    return Opaque.tryWriteFrom(writable)
   }
 
 }
@@ -108,7 +186,7 @@ export namespace SafeOpaque {
    * @param cursor 
    * @returns 
    */
-  export function tryRead(cursor: Cursor): Result<Opaque, CursorReadLengthOverflowError> {
+  export function tryRead(cursor: Cursor): Result<Opaque, BinaryReadError> {
     return cursor.tryRead(cursor.remaining).mapSync(Opaque.from)
   }
 
@@ -117,8 +195,10 @@ export namespace SafeOpaque {
    * @param writable 
    * @returns 
    */
-  export function tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | CursorWriteLenghtUnderflowError> {
-    return Opaque.tryFrom(writable)
+  export function tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
+    if (writable instanceof Opaque)
+      return Opaque.tryFrom(writable.bytes)
+    return Opaque.tryWriteFrom(writable)
   }
 
 
