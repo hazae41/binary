@@ -56,7 +56,7 @@ export namespace Readable {
       const output = readable.tryRead(cursor).throw(t)
 
       if (cursor.remaining)
-        return new Err(new CursorReadLengthUnderflowError(cursor))
+        return new Err(CursorReadLengthUnderflowError.from(cursor))
 
       return new Ok(output)
     })

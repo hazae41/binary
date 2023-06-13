@@ -15,10 +15,16 @@ export class CursorReadLengthUnderflowError extends Error {
   readonly name = this.#class.name
 
   constructor(
-    readonly cursor: Cursor
+    readonly cursorOffset: number,
+    readonly cursorLength: number
   ) {
-    super(`Cursor has ${cursor.remaining} remaining bytes after read`)
+    super(`Cursor has ${cursorLength - cursorOffset} remaining bytes after read`)
   }
+
+  static from(cursor: Cursor) {
+    return new CursorReadLengthUnderflowError(cursor.offset, cursor.length)
+  }
+
 }
 
 export type BinaryWriteError =
@@ -31,8 +37,14 @@ export class CursorWriteLenghtUnderflowError extends Error {
   readonly name = this.#class.name
 
   constructor(
-    readonly cursor: Cursor
+    readonly cursorOffset: number,
+    readonly cursorLength: number
   ) {
-    super(`Cursor has ${cursor.remaining} remaining bytes after write`)
+    super(`Cursor has ${cursorLength - cursorOffset} remaining bytes after write`)
   }
+
+  static from(cursor: Cursor) {
+    return new CursorWriteLenghtUnderflowError(cursor.offset, cursor.length)
+  }
+
 }

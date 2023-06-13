@@ -45,7 +45,7 @@ export namespace Writable {
       writable.tryWrite(cursor).throw(t)
 
       if (cursor.remaining)
-        return new Err(new CursorWriteLenghtUnderflowError(cursor))
+        return new Err(CursorWriteLenghtUnderflowError.from(cursor))
 
       return new Ok(cursor.bytes)
     })
