@@ -89,6 +89,6 @@ const myobject = opaque.tryInto(MyObject).unwrap() // MyObject(1, 515)
 
 ```typescript
 const myobject = new MyObject(1, 515)
-const opaque = Opaque.tryFrom(myobject).unwrap() // Opaque(Uint8Array([1, 2, 3]))
+const opaque = Opaque.tryWriteFrom(myobject).unwrap() // Opaque(Uint8Array([1, 2, 3]))
 const bytes = Writable.tryWriteToBytes(opaque).unwrap() // Uint8Array([1, 2, 3])
 ```

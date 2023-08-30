@@ -1,4 +1,4 @@
-import { Bytes, BytesAllocError, Sized } from "@hazae41/bytes";
+import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 import { Readable } from "mods/binary/readable.js";
@@ -17,99 +17,6 @@ export class Opaque<T extends Bytes = Bytes> {
 
   static new<T extends Bytes>(bytes: T) {
     return new Opaque(bytes)
-  }
-
-  /**
-   * Bytes.empty
-   * @deprecated
-   * @returns 
-   */
-  static empty() {
-    return new Opaque(Bytes.alloc(0))
-  }
-
-  /**
-   * Bytes.tryEmpty
-   * @returns 
-   */
-  static tryEmpty(): Result<Opaque<Bytes<0>>, BytesAllocError<0>> {
-    return Bytes.tryEmpty().mapSync(Opaque.new)
-  }
-
-  /**
-   * Bytes.alloc
-   * @deprecated
-   * @param length 
-   * @returns 
-   */
-  static alloc<N extends number>(length: N) {
-    return new Opaque(Bytes.alloc(length))
-  }
-
-  /**
-   * Bytes.tryAlloc
-   * @param length 
-   * @returns 
-   */
-  static tryAlloc<N extends number>(length: N): Result<Opaque<Bytes<N>>, BytesAllocError<N>> {
-    return Bytes.tryAlloc(length).mapSync(Opaque.new)
-  }
-
-  /**
-   * Bytes.allocUnsafe
-   * @deprecated
-   * @param length 
-   * @returns 
-   */
-  static allocUnsafe<N extends number>(length: N) {
-    return new Opaque(Bytes.allocUnsafe(length))
-  }
-
-  /**
-   * Bytes.tryAllocUnsafe
-   * @param length 
-   * @returns 
-   */
-  static tryAllocUnsafe<N extends number>(length: N): Result<Opaque<Bytes<N>>, BytesAllocError<N>> {
-    return Bytes.tryAllocUnsafe(length).mapSync(Opaque.new)
-  }
-
-  /**
-   * Bytes.from
-   * @deprecated
-   * @param sized 
-   * @returns 
-   */
-  static from<N extends number>(sized: Sized<number, N>) {
-    return new Opaque(Bytes.from(sized))
-  }
-
-  /**
-   * Bytes.tryFrom
-   * @param sized 
-   * @returns 
-   */
-  static tryFrom<N extends number>(sized: Sized<number, N>): Result<Opaque<Bytes<N>>, BytesAllocError<N>> {
-    return Bytes.tryFrom(sized).mapSync(Opaque.new)
-  }
-
-  /**
-   * Bytes.random
-   * @deprecated
-   * @param length 
-   * @returns 
-   */
-  static random<N extends number>(length: N) {
-    return new Opaque(Bytes.random(length))
-  }
-
-  /**
-   * Bytes.tryRandom
-   * @param length 
-   * @returns 
-   */
-  static tryRandom<N extends number>(length: N): Result<Opaque<Bytes<N>>, BytesAllocError<N>> {
-    return Bytes.tryRandom(length).mapSync(Opaque.new)
   }
 
   /**
@@ -164,13 +71,13 @@ export namespace UnsafeOpaque {
   }
 
   /**
-   * Perform unsafe zero-copy conversion to `Opaque` if `T instanceof Opaque`, else use `Opaque.tryFrom`
+   * Perform unsafe zero-copy conversion to `Opaque` if `T instanceof Opaque`, else use `Opaque.tryWriteFrom`
    * @param writable 
    * @returns 
    */
-  export function tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
+  export function tryWriteFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
     if (writable instanceof Opaque)
-      return new Ok(writable)
+      return new Ok(new Opaque(writable.bytes))
     return Opaque.tryWriteFrom(writable)
   }
 
@@ -187,19 +94,18 @@ export namespace SafeOpaque {
    * @returns 
    */
   export function tryRead(cursor: Cursor): Result<Opaque, BinaryReadError> {
-    return cursor.tryRead(cursor.remaining).mapSync(Opaque.from)
+    return cursor.tryRead(cursor.remaining).mapSync(Bytes.from).mapSync(Opaque.new)
   }
 
   /**
-   * Perform safe, copy conversion to `Opaque` using `Opaque.tryFrom`
+   * Perform safe copy conversion to `Opaque` if `T instanceof Opaque`, else use `Opaque.tryWriteFrom`
    * @param writable 
    * @returns 
    */
-  export function tryFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
+  export function tryWriteFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
     if (writable instanceof Opaque)
-      return Opaque.tryFrom(writable.bytes)
+      return Bytes.tryFrom(writable.bytes).mapSync(Opaque.new)
     return Opaque.tryWriteFrom(writable)
   }
-
 
 }
