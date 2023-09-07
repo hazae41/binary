@@ -1,4 +1,3 @@
-import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
 import { BinaryReadError, CursorReadLengthUnderflowError } from "./errors.js";
@@ -50,7 +49,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function tryReadFromBytes<T extends Infer<T>>(readable: T, bytes: Bytes): Result<ReadOutput<T>, ReadError<T> | BinaryReadError> {
+  export function tryReadFromBytes<T extends Infer<T>>(readable: T, bytes: Uint8Array): Result<ReadOutput<T>, ReadError<T> | BinaryReadError> {
     return Result.unthrowSync(t => {
       const cursor = new Cursor(bytes)
       const output = readable.tryRead(cursor).throw(t)

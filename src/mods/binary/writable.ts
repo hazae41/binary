@@ -6,7 +6,7 @@ import { BinaryWriteError, CursorWriteLenghtUnderflowError } from "./errors.js"
 /**
  * A writable binary data type
  */
-export interface Writable<SizeError = unknown, WriteError = unknown> {
+export interface Writable<SizeError = unknown, WriteError = unknown> extends Disposable {
 
   /**
    * Compute the amount of bytes to allocate
@@ -36,7 +36,7 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes<T extends Writable.Infer<T>>(writable: T): Result<Bytes, SizeError<T> | WriteError<T> | BinaryWriteError> {
+  export function tryWriteToBytes<T extends Writable.Infer<T>>(writable: T): Result<Uint8Array, SizeError<T> | WriteError<T> | BinaryWriteError> {
     return Result.unthrowSync(t => {
       const size = writable.trySize().throw(t)
       const bytes = Bytes.tryAllocUnsafe(size).throw(t)

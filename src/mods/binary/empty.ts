@@ -8,6 +8,8 @@ export class Empty {
    */
   constructor() { }
 
+  [Symbol.dispose]() { }
+
   trySize(): Result<number, never> {
     return new Ok(0)
   }

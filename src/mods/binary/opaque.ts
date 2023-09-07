@@ -5,7 +5,7 @@ import { Readable } from "mods/binary/readable.js";
 import { BinaryReadError, BinaryWriteError } from "./errors.js";
 import { Writable } from "./writable.js";
 
-export class Opaque<T extends Bytes = Bytes> {
+export class Opaque<T extends Uint8Array = Uint8Array> {
 
   /**
    * A binary data type that just holds bytes
@@ -15,7 +15,9 @@ export class Opaque<T extends Bytes = Bytes> {
     readonly bytes: T
   ) { }
 
-  static new<T extends Bytes>(bytes: T) {
+  [Symbol.dispose]() { }
+
+  static new<T extends Uint8Array>(bytes: T) {
     return new Opaque(bytes)
   }
 
