@@ -6,7 +6,7 @@ import { BinaryWriteError, CursorWriteLenghtUnderflowError } from "./errors.js"
 /**
  * A writable binary data type
  */
-export interface Writable<SizeError = unknown, WriteError = unknown> extends Disposable {
+export interface Writable<SizeError = unknown, WriteError = unknown> {
 
   /**
    * Compute the amount of bytes to allocate
