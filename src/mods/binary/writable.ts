@@ -22,12 +22,23 @@ export interface Writable {
 
 export namespace Writable {
 
+  /**
+   * Call sizeOrThrow()
+   * @param writable 
+   * @returns 
+   */
   export function trySize(writable: Writable) {
     return Result.runAndWrapSync(() => {
       return writable.sizeOrThrow()
     }).mapErrSync(SizeUnknownError.from)
   }
 
+  /**
+   * Call writeOrThrow()
+   * @param writable 
+   * @param cursor 
+   * @returns 
+   */
   export function tryWrite(writable: Writable, cursor: Cursor) {
     return Result.runAndWrapSync(() => {
       writable.writeOrThrow(cursor)

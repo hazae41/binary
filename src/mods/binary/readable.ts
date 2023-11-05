@@ -21,6 +21,12 @@ export namespace Readable {
 
   export type Output<T extends Readable> = T extends Readable<infer O> ? O : never
 
+  /**
+   * Call readOrThrow()
+   * @param readable 
+   * @param cursor 
+   * @returns 
+   */
   export function tryRead<T extends Infer<T>>(readable: T, cursor: Cursor): Result<Output<T>, ReadUnknownError> {
     return Result.runAndWrapSync(() => {
       return readable.readOrThrow(cursor)
