@@ -1,53 +1,77 @@
-import { Bytes } from "@hazae41/bytes"
 import { Cursor } from "@hazae41/cursor"
 import { Err, Ok, Result } from "@hazae41/result"
-import { BinaryWriteError, CursorWriteLenghtUnderflowError } from "./errors.js"
+import { SizeUnknownError, WriteUnderflowError, WriteUnknownError } from "./errors.js"
 
 /**
  * A writable binary data type
  */
-export interface Writable<SizeError = unknown, WriteError = unknown> {
+export interface Writable {
 
   /**
    * Compute the amount of bytes to allocate
    */
-  trySize(): Result<number, SizeError>
+  sizeOrThrow(): number
 
   /**
    * Write to a cursor
    * @param cursor 
    */
-  tryWrite(cursor: Cursor): Result<void, WriteError>
+  writeOrThrow(cursor: Cursor): void
 
 }
 
 export namespace Writable {
 
-  export type Infer<T extends Writable> = Writable<SizeError<T>, WriteError<T>>
+  export function trySize(writable: Writable) {
+    return Result.runAndWrapSync(() => {
+      return writable.sizeOrThrow()
+    }).mapErrSync(SizeUnknownError.from)
+  }
 
-  export type SizeError<T extends Writable> = T extends Writable<infer SizeError, unknown> ? SizeError : never
-
-  export type WriteError<T extends Writable> = T extends Writable<unknown, infer WriteError> ? WriteError : never
+  export function tryWrite(writable: Writable, cursor: Cursor) {
+    return Result.runAndWrapSync(() => {
+      writable.writeOrThrow(cursor)
+    }).mapErrSync(WriteUnknownError.from)
+  }
 
   /**
-   * Write to bytes and check for underflow
-   * 
-   * Underflow is when the cursor has remaining bytes; meaning we have written less bytes than allocated
+   * Call writeOrThrow() on sizeOrThrow()-sized bytes and check for underflow
+   * @throws whatever sizeOrThrow() or writeOrThrow() throws
    * @param writable 
    * @returns 
    */
-  export function tryWriteToBytes<T extends Writable.Infer<T>>(writable: T): Result<Uint8Array, SizeError<T> | WriteError<T> | BinaryWriteError> {
-    return Result.unthrowSync(t => {
-      const size = writable.trySize().throw(t)
-      const bytes = Bytes.tryAllocUnsafe(size).throw(t)
+  export function writeToBytesOrThrow(writable: Writable) {
+    const size = writable.sizeOrThrow()
 
+    const bytes = new Uint8Array(size)
+    const cursor = new Cursor(bytes)
+
+    writable.writeOrThrow(cursor)
+
+    if (cursor.remaining)
+      throw WriteUnderflowError.from(cursor)
+
+    return bytes
+  }
+
+  /**
+   * Call writeOrThrow() on sizeOrThrow()-sized bytes and check for underflow
+   * @param writable 
+   * @returns 
+   */
+  export function tryWriteToBytes(writable: Writable): Result<Uint8Array, SizeUnknownError | WriteUnknownError | WriteUnderflowError> {
+    return Result.unthrowSync(t => {
+      const size = trySize(writable).throw(t)
+
+      const bytes = new Uint8Array(size)
       const cursor = new Cursor(bytes)
-      writable.tryWrite(cursor).throw(t)
+
+      tryWrite(writable, cursor).throw(t)
 
       if (cursor.remaining)
-        return new Err(CursorWriteLenghtUnderflowError.from(cursor))
+        return new Err(WriteUnderflowError.from(cursor))
 
-      return new Ok(cursor.bytes)
+      return new Ok(bytes)
     })
   }
 

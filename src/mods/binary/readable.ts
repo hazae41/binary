@@ -1,61 +1,97 @@
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
-import { BinaryReadError, CursorReadLengthUnderflowError } from "./errors.js";
+import { ReadUnderflowError, ReadUnknownError } from "./errors.js";
 
 /**
  * A readable binary data type
  */
-export interface Readable<ReadOutput = unknown, ReadError = unknown> {
+export interface Readable<Output = unknown> {
 
   /**
    * Read from a cursor
    * @param cursor 
    */
-  tryRead(cursor: Cursor): Result<ReadOutput, ReadError>
+  readOrThrow(cursor: Cursor): Output
 
 }
 
 export namespace Readable {
 
-  export type Infer<T extends Readable> = Readable<Readable.ReadOutput<T>, Readable.ReadError<T>>
+  export type Infer<T extends Readable> = Readable<Readable.Output<T>>
 
-  export type ReadOutput<T extends Readable> = T extends Readable<infer ReadOutput, unknown> ? ReadOutput : never
+  export type Output<T extends Readable> = T extends Readable<infer O> ? O : never
 
-  export type ReadError<T extends Readable> = T extends Readable<unknown, infer ReadError> ? ReadError : never
+  export function tryRead<T extends Infer<T>>(readable: T, cursor: Cursor): Result<Output<T>, ReadUnknownError> {
+    return Result.runAndWrapSync(() => {
+      return readable.readOrThrow(cursor)
+    }).mapErrSync(ReadUnknownError.from)
+  }
 
   /**
-   * Try to read a binary data type from a cursor
-   * - on Ok: returns the Ok containing the BDT
-   * - on Err: rollback the offset, and returns the Err
+   * Call readOrThrow() but rollback the cursor on error
+   * @throws whatever readOrThrow() throws
    * @param readable 
    * @param cursor 
    * @returns 
    */
-  export function tryReadOrRollback<T extends Infer<T>>(readable: T, cursor: Cursor): Result<ReadOutput<T>, ReadError<T>> {
+  export function readOrRollbackAndThrow<T extends Infer<T>>(readable: T, cursor: Cursor): Output<T> {
     const offset = cursor.offset
-    const result = readable.tryRead(cursor)
 
-    if (result.isErr())
+    try {
+      return readable.readOrThrow(cursor)
+    } catch (e: unknown) {
       cursor.offset = offset
-
-    return result
+      throw e
+    }
   }
 
   /**
-   * Read from bytes and check for underflow
-   * 
-   * Underflow is when the cursor has remaining bytes; meaning we read less bytes than the expected length
+   * Call readOrThrow() but rollback the cursor on error
+   * @param readable 
+   * @param cursor 
+   * @returns 
+   */
+  export function tryReadOrRollback<T extends Infer<T>>(readable: T, cursor: Cursor): Result<Output<T>, ReadUnknownError> {
+    const offset = cursor.offset
+    const output = tryRead(readable, cursor)
+
+    if (output.isErr())
+      cursor.offset = offset
+
+    return output
+  }
+
+  /**
+   * Call readOrThrow() on the given bytes and check for underflow
+   * @throws whatever readOrThrow() throws
+   * @throws ReadUnderflowError on underflow
    * @param readable 
    * @param bytes 
    * @returns 
    */
-  export function tryReadFromBytes<T extends Infer<T>>(readable: T, bytes: Uint8Array): Result<ReadOutput<T>, ReadError<T> | BinaryReadError> {
+  export function readFromBytesOrThrow<T extends Infer<T>>(readable: T, bytes: Uint8Array): Output<T> {
+    const cursor = new Cursor(bytes)
+    const output = readable.readOrThrow(cursor)
+
+    if (cursor.remaining)
+      throw ReadUnderflowError.from(cursor)
+
+    return output
+  }
+
+  /**
+   * Call readOrThrow() on the given bytes and check for underflow
+   * @param readable 
+   * @param bytes 
+   * @returns 
+   */
+  export function tryReadFromBytes<T extends Infer<T>>(readable: T, bytes: Uint8Array): Result<Output<T>, ReadUnknownError | ReadUnderflowError> {
     return Result.unthrowSync(t => {
       const cursor = new Cursor(bytes)
-      const output = readable.tryRead(cursor).throw(t)
+      const output = tryRead(readable, cursor).throw(t)
 
       if (cursor.remaining)
-        return new Err(CursorReadLengthUnderflowError.from(cursor))
+        return new Err(ReadUnderflowError.from(cursor))
 
       return new Ok(output)
     })

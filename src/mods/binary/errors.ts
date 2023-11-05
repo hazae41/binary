@@ -1,17 +1,29 @@
-import { BytesError } from "@hazae41/bytes"
-import { Cursor, CursorReadError, CursorWriteError } from "@hazae41/cursor"
+import { Cursor } from "@hazae41/cursor"
 
-export type BinaryError =
-  | BinaryReadError
-  | BinaryWriteError
+export type ReadWriteError =
+  | ReadError
+  | WriteError
 
-export type BinaryReadError =
-  | BytesError
-  | CursorReadLengthUnderflowError
-  | CursorReadError
+export type ReadError =
+  | ReadUnderflowError
+  | ReadUnknownError
 
-export class CursorReadLengthUnderflowError extends Error {
-  readonly #class = CursorReadLengthUnderflowError
+export class ReadUnknownError extends Error {
+  readonly #class = ReadUnknownError
+  readonly name = this.#class.name
+
+  constructor(options: ErrorOptions) {
+    super(`Could not read`, options)
+  }
+
+  static from(cause: unknown) {
+    return new ReadUnknownError({ cause })
+  }
+
+}
+
+export class ReadUnderflowError extends Error {
+  readonly #class = ReadUnderflowError
   readonly name = this.#class.name
 
   constructor(
@@ -22,18 +34,46 @@ export class CursorReadLengthUnderflowError extends Error {
   }
 
   static from(cursor: Cursor) {
-    return new CursorReadLengthUnderflowError(cursor.offset, cursor.length)
+    return new ReadUnderflowError(cursor.offset, cursor.length)
   }
 
 }
 
-export type BinaryWriteError =
-  | BytesError
-  | CursorWriteLenghtUnderflowError
-  | CursorWriteError
+export type WriteError =
+  | SizeUnknownError
+  | WriteUnderflowError
+  | WriteUnknownError
 
-export class CursorWriteLenghtUnderflowError extends Error {
-  readonly #class = CursorWriteLenghtUnderflowError
+export class SizeUnknownError extends Error {
+  readonly #class = SizeUnknownError
+  readonly name = this.#class.name
+
+  constructor(options: ErrorOptions) {
+    super(`Could not size`, options)
+  }
+
+  static from(cause: unknown) {
+    return new SizeUnknownError({ cause })
+  }
+
+}
+
+export class WriteUnknownError extends Error {
+  readonly #class = WriteUnderflowError
+  readonly name = this.#class.name
+
+  constructor(options: ErrorOptions) {
+    super(`Could not write`, options)
+  }
+
+  static from(cause: unknown) {
+    return new WriteUnknownError({ cause })
+  }
+
+}
+
+export class WriteUnderflowError extends Error {
+  readonly #class = WriteUnderflowError
   readonly name = this.#class.name
 
   constructor(
@@ -44,7 +84,7 @@ export class CursorWriteLenghtUnderflowError extends Error {
   }
 
   static from(cursor: Cursor) {
-    return new CursorWriteLenghtUnderflowError(cursor.offset, cursor.length)
+    return new WriteUnderflowError(cursor.offset, cursor.length)
   }
 
 }

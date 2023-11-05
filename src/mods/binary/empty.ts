@@ -1,25 +1,19 @@
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result } from "@hazae41/result";
 
 export class Empty {
 
-  /**
-   * An empty BDT
-   */
   constructor() { }
 
-  [Symbol.dispose]() { }
-
-  trySize(): Result<number, never> {
-    return new Ok(0)
+  sizeOrThrow() {
+    return 0
   }
 
-  tryWrite(cursor: Cursor): Result<void, never> {
-    return Ok.void()
+  writeOrThrow(cursor: Cursor) {
+    return
   }
 
-  static tryRead(cursor: Cursor): Result<Empty, never> {
-    return new Ok(new Empty())
+  static readOrThrow(cursor: Cursor) {
+    return new Empty()
   }
 
 }

@@ -1,8 +1,7 @@
-import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 import { Readable } from "mods/binary/readable.js";
-import { BinaryReadError, BinaryWriteError } from "./errors.js";
+import { ReadError, WriteError } from "./errors.js";
 import { Writable } from "./writable.js";
 
 export class Opaque<T extends Uint8Array = Uint8Array> {
@@ -15,27 +14,30 @@ export class Opaque<T extends Uint8Array = Uint8Array> {
     readonly bytes: T
   ) { }
 
-  [Symbol.dispose]() { }
-
+  /**
+   * View bytes into a new Opaque
+   * @param bytes 
+   * @returns 
+   */
   static new<T extends Uint8Array>(bytes: T) {
     return new Opaque(bytes)
   }
 
   /**
-   * Size this
+   * Copy bytes into a new Opaque
+   * @param bytes 
    * @returns 
    */
-  trySize(): Result<number, never> {
-    return new Ok(this.bytes.length)
+  static from(bytes: Uint8Array) {
+    return new Opaque(new Uint8Array(bytes))
   }
 
-  /**
-   * Write this
-   * @param cursor 
-   * @returns 
-   */
-  tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-    return cursor.tryWrite(this.bytes)
+  sizeOrThrow() {
+    return this.bytes.length
+  }
+
+  writeOrThrow(cursor: Cursor) {
+    cursor.tryWrite(this.bytes)
   }
 
   /**
@@ -43,7 +45,16 @@ export class Opaque<T extends Uint8Array = Uint8Array> {
    * @param readable 
    * @returns 
    */
-  tryReadInto<T extends Readable.Infer<T>>(readable: T): Result<Readable.ReadOutput<T>, Readable.ReadError<T> | BinaryReadError> {
+  readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
+    return Readable.readFromBytesOrThrow(readable, this.bytes)
+  }
+
+  /**
+   * Transform this opaque into a binary data type
+   * @param readable 
+   * @returns 
+   */
+  tryReadInto<T extends Readable.Infer<T>>(readable: T): Result<Readable.Output<T>, ReadError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
@@ -52,7 +63,16 @@ export class Opaque<T extends Uint8Array = Uint8Array> {
    * @param writable 
    * @returns 
    */
-  static tryWriteFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
+  static writeFromOrThrow(writable: Writable): Opaque {
+    return new Opaque(Writable.writeToBytesOrThrow(writable))
+  }
+
+  /**
+   * Create an opaque from a binary data type
+   * @param writable 
+   * @returns 
+   */
+  static tryWriteFrom(writable: Writable): Result<Opaque, WriteError> {
     return Writable.tryWriteToBytes(writable).mapSync(Opaque.new)
   }
 
@@ -68,18 +88,33 @@ export namespace UnsafeOpaque {
    * @param cursor 
    * @returns 
    */
-  export function tryRead(cursor: Cursor): Result<Opaque, BinaryReadError> {
-    return cursor.tryRead(cursor.remaining).mapSync(Opaque.new)
+  export function read(cursor: Cursor) {
+    return new Opaque(cursor.after)
+  }
+
+  export function readOrThrow(cursor: Cursor) {
+    return read(cursor)
   }
 
   /**
-   * Perform unsafe zero-copy conversion to `Opaque` if `T instanceof Opaque`, else use `Opaque.tryWriteFrom`
+   * Perform unsafe zero-copy conversion to Opaque if already Opaque
    * @param writable 
    * @returns 
    */
-  export function tryWriteFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
+  export function writeFromOrThrow(writable: Writable) {
     if (writable instanceof Opaque)
-      return new Ok(new Opaque(writable.bytes))
+      return writable
+    return Opaque.writeFromOrThrow(writable)
+  }
+
+  /**
+   * Perform unsafe zero-copy conversion to Opaque if already Opaque
+   * @param writable 
+   * @returns 
+   */
+  export function tryWriteFrom(writable: Writable): Result<Opaque, WriteError> {
+    if (writable instanceof Opaque)
+      return new Ok(writable)
     return Opaque.tryWriteFrom(writable)
   }
 
@@ -95,18 +130,33 @@ export namespace SafeOpaque {
    * @param cursor 
    * @returns 
    */
-  export function tryRead(cursor: Cursor): Result<Opaque, BinaryReadError> {
-    return cursor.tryRead(cursor.remaining).mapSync(Bytes.from).mapSync(Opaque.new)
+  export function read(cursor: Cursor) {
+    return Opaque.from(cursor.after)
+  }
+
+  export function readOrThrow(cursor: Cursor) {
+    return read(cursor)
   }
 
   /**
-   * Perform safe copy conversion to `Opaque` if `T instanceof Opaque`, else use `Opaque.tryWriteFrom`
+   * Perform safe copy conversion to Opaque if already Opaque
    * @param writable 
    * @returns 
    */
-  export function tryWriteFrom<T extends Writable.Infer<T>>(writable: T): Result<Opaque, Writable.SizeError<T> | Writable.WriteError<T> | BinaryWriteError> {
+  export function writeFromOrThrow(writable: Writable) {
     if (writable instanceof Opaque)
-      return Bytes.tryFrom(writable.bytes).mapSync(Opaque.new)
+      return Opaque.from(writable.bytes)
+    return Opaque.writeFromOrThrow(writable)
+  }
+
+  /**
+   * Perform safe copy conversion to Opaque if already Opaque
+   * @param writable 
+   * @returns 
+   */
+  export function tryWriteFrom(writable: Writable): Result<Opaque, WriteError> {
+    if (writable instanceof Opaque)
+      return new Ok(Opaque.from(writable.bytes))
     return Opaque.tryWriteFrom(writable)
   }
 
