@@ -89,7 +89,7 @@ export namespace UnsafeOpaque {
    * @returns 
    */
   export function read(cursor: Cursor) {
-    return new Opaque(cursor.after)
+    return new Opaque(cursor.readOrThrow(cursor.remaining))
   }
 
   export function readOrThrow(cursor: Cursor) {
@@ -131,7 +131,7 @@ export namespace SafeOpaque {
    * @returns 
    */
   export function read(cursor: Cursor) {
-    return Opaque.from(cursor.after)
+    return Opaque.from(cursor.readOrThrow(cursor.remaining))
   }
 
   export function readOrThrow(cursor: Cursor) {
