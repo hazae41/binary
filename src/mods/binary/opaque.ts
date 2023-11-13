@@ -83,17 +83,14 @@ export class Opaque<T extends Uint8Array = Uint8Array> {
  */
 export namespace UnsafeOpaque {
 
+
   /**
    * Unsafe zero-copy read remaining bytes from cursor
    * @param cursor 
    * @returns 
    */
-  export function read(cursor: Cursor) {
-    return new Opaque(cursor.readOrThrow(cursor.remaining))
-  }
-
   export function readOrThrow(cursor: Cursor) {
-    return read(cursor)
+    return new Opaque(cursor.readOrThrow(cursor.remaining))
   }
 
   /**
@@ -130,12 +127,8 @@ export namespace SafeOpaque {
    * @param cursor 
    * @returns 
    */
-  export function read(cursor: Cursor) {
-    return Opaque.from(cursor.readOrThrow(cursor.remaining))
-  }
-
   export function readOrThrow(cursor: Cursor) {
-    return read(cursor)
+    return new Opaque(cursor.readAndCopyOrThrow(cursor.remaining))
   }
 
   /**
