@@ -69,6 +69,26 @@ export namespace Readable {
 
   /**
    * Call readOrThrow() on the given bytes and check for underflow
+   * @param readable 
+   * @param bytes 
+   * @returns 
+   */
+  export function readFromBytesOrNull<T extends Infer<T>>(readable: T, bytes: Uint8Array): Output<T> | undefined {
+    try {
+      const cursor = new Cursor(bytes)
+      const output = readable.readOrThrow(cursor)
+
+      if (cursor.remaining)
+        return undefined
+
+      return output
+    } catch (e: unknown) {
+      return undefined
+    }
+  }
+
+  /**
+   * Call readOrThrow() on the given bytes and check for underflow
    * @throws whatever readOrThrow() throws
    * @throws ReadUnderflowError on underflow
    * @param readable 
