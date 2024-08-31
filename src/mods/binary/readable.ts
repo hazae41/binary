@@ -1,6 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result } from "@hazae41/result";
-import { ReadUnderflowError, ReadUnknownError } from "./errors.js";
+import { ReadUnderflowError } from "./errors.js";
 
 /**
  * A readable binary data type
@@ -22,18 +21,6 @@ export namespace Readable {
   export type Output<T extends Readable> = T extends Readable<infer O> ? O : never
 
   /**
-   * Call readOrThrow()
-   * @param readable 
-   * @param cursor 
-   * @returns 
-   */
-  export function tryRead<T extends Infer<T>>(readable: T, cursor: Cursor): Result<Output<T>, ReadUnknownError> {
-    return Result.runAndWrapSync(() => {
-      return readable.readOrThrow(cursor)
-    }).mapErrSync(ReadUnknownError.from)
-  }
-
-  /**
    * Call readOrThrow() but rollback the cursor on error
    * @throws whatever readOrThrow() throws
    * @param readable 
@@ -49,22 +36,6 @@ export namespace Readable {
       cursor.offset = offset
       throw e
     }
-  }
-
-  /**
-   * Call readOrThrow() but rollback the cursor on error
-   * @param readable 
-   * @param cursor 
-   * @returns 
-   */
-  export function tryReadOrRollback<T extends Infer<T>>(readable: T, cursor: Cursor): Result<Output<T>, ReadUnknownError> {
-    const offset = cursor.offset
-    const output = tryRead(readable, cursor)
-
-    if (output.isErr())
-      cursor.offset = offset
-
-    return output
   }
 
   /**
@@ -103,24 +74,6 @@ export namespace Readable {
       throw ReadUnderflowError.from(cursor)
 
     return output
-  }
-
-  /**
-   * Call readOrThrow() on the given bytes and check for underflow
-   * @param readable 
-   * @param bytes 
-   * @returns 
-   */
-  export function tryReadFromBytes<T extends Infer<T>>(readable: T, bytes: Uint8Array): Result<Output<T>, ReadUnknownError | ReadUnderflowError> {
-    return Result.unthrowSync(t => {
-      const cursor = new Cursor(bytes)
-      const output = tryRead(readable, cursor).throw(t)
-
-      if (cursor.remaining)
-        return new Err(ReadUnderflowError.from(cursor))
-
-      return new Ok(output)
-    })
   }
 
 }

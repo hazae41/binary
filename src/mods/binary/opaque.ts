@@ -1,7 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result } from "@hazae41/result";
 import { Readable } from "mods/binary/readable.js";
-import { ReadError, WriteError } from "./errors.js";
 import { Writable } from "./writable.js";
 
 export class Opaque<T extends Uint8Array = Uint8Array> {
@@ -37,7 +35,7 @@ export class Opaque<T extends Uint8Array = Uint8Array> {
   }
 
   writeOrThrow(cursor: Cursor) {
-    cursor.tryWrite(this.bytes)
+    cursor.writeOrThrow(this.bytes)
   }
 
   /**
@@ -50,30 +48,12 @@ export class Opaque<T extends Uint8Array = Uint8Array> {
   }
 
   /**
-   * Transform this opaque into a binary data type
-   * @param readable 
-   * @returns 
-   */
-  tryReadInto<T extends Readable.Infer<T>>(readable: T): Result<Readable.Output<T>, ReadError> {
-    return Readable.tryReadFromBytes(readable, this.bytes)
-  }
-
-  /**
    * Create an opaque from a binary data type
    * @param writable 
    * @returns 
    */
   static writeFromOrThrow(writable: Writable): Opaque {
     return new Opaque(Writable.writeToBytesOrThrow(writable))
-  }
-
-  /**
-   * Create an opaque from a binary data type
-   * @param writable 
-   * @returns 
-   */
-  static tryWriteFrom(writable: Writable): Result<Opaque, WriteError> {
-    return Writable.tryWriteToBytes(writable).mapSync(Opaque.new)
   }
 
 }
@@ -104,17 +84,6 @@ export namespace UnsafeOpaque {
     return Opaque.writeFromOrThrow(writable)
   }
 
-  /**
-   * Perform unsafe zero-copy conversion to Opaque if already Opaque
-   * @param writable 
-   * @returns 
-   */
-  export function tryWriteFrom(writable: Writable): Result<Opaque, WriteError> {
-    if (writable instanceof Opaque)
-      return new Ok(writable)
-    return Opaque.tryWriteFrom(writable)
-  }
-
 }
 
 /**
@@ -140,17 +109,6 @@ export namespace SafeOpaque {
     if (writable instanceof Opaque)
       return Opaque.from(writable.bytes)
     return Opaque.writeFromOrThrow(writable)
-  }
-
-  /**
-   * Perform safe copy conversion to Opaque if already Opaque
-   * @param writable 
-   * @returns 
-   */
-  export function tryWriteFrom(writable: Writable): Result<Opaque, WriteError> {
-    if (writable instanceof Opaque)
-      return new Ok(Opaque.from(writable.bytes))
-    return Opaque.tryWriteFrom(writable)
   }
 
 }
