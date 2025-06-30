@@ -29,17 +29,13 @@ class MyObject implements Writable {
     readonly y: number
   ) {}
 
-  size() {
+  sizeOrThrow() {
     return 1 + 2
   }
 
-  write(cursor: Cursor): Result<void, Error> {
-    return Result.unthrowSync(() => {
-      cursor.tryWriteUint8(this.x).throw()
-      cursor.tryWriteUint16(this.y).throw()
-
-      return Ok.void()
-    })
+  writeOrThrow(cursor: Cursor) {
+    cursor.writeUint8OrThrow(this.x)
+    cursor.writeUint16OrThrow(this.y)
   }
 
 }
@@ -47,7 +43,7 @@ class MyObject implements Writable {
 
 ```typescript
 const myobject = new MyObject(1, 515)
-const bytes = Writable.tryWriteToBytes(myobject).unwrap() // Uint8Array([1, 2, 3])
+const bytes = Writable.writeToBytesOrThrow(myobject) // Uint8Array([1, 2, 3])
 ```
 
 #### Readable
@@ -60,13 +56,11 @@ class MyObject {
     readonly y: number
   ) {}
 
-  static read(cursor: Cursor): Result<MyObject, Error> {
-    return Result.unthrowSync(() => {
-      const x = cursor.tryReadUint8().throw()
-      const y = cursor.tryReadUint16().throw()
+  static readOrThrow(cursor: Cursor): MyObject {
+    const x = cursor.readUint8OrThrow()
+    const y = cursor.readUint16OrThrow()
 
-      return new Ok(new this(x, y))
-    })
+    return new MyObject(x, y)
   }
 
 }
@@ -74,7 +68,7 @@ class MyObject {
 
 ```typescript
 const bytes = new Uint8Array([1, 2, 3])
-const myobject = Readable.tryReadFromBytes(MyObject, bytes).unwrap() // MyObject(1, 515)
+const myobject = Readable.readFromBytesOrThrow(MyObject, bytes) // MyObject(1, 515)
 ```
 
 #### Opaque
@@ -83,12 +77,12 @@ This is a binary data type that just holds bytes, it can be used when a binary d
 
 ```typescript
 const bytes = new Uint8Array([1, 2, 3])
-const opaque = Readable.tryReadFromBytes(SafeOpaque, bytes).unwrap() // Opaque(Uint8Array([1, 2, 3]))
-const myobject = opaque.tryInto(MyObject).unwrap() // MyObject(1, 515)
+const opaque = Readable.readFromBytesOrThrow(Opaque.Uncopied, bytes) // Opaque(Uint8Array([1, 2, 3]))
+const myobject = opaque.readIntoOrThrow(MyObject) // MyObject(1, 515)
 ```
 
 ```typescript
 const myobject = new MyObject(1, 515)
-const opaque = Opaque.tryWriteFrom(myobject).unwrap() // Opaque(Uint8Array([1, 2, 3]))
-const bytes = Writable.tryWriteToBytes(opaque).unwrap() // Uint8Array([1, 2, 3])
+const opaque = Opaque.writeFromOrThrow(myobject) // Opaque.Copied(Uint8Array([1, 2, 3]))
+const bytes = Writable.writeToBytesOrThrow(opaque) // Uint8Array([1, 2, 3])
 ```
