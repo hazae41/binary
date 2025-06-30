@@ -1,5 +1,7 @@
+export * from "./errors/index.js"
+
 import { Cursor } from "@hazae41/cursor"
-import { WriteUnderflowError } from "./errors.js"
+import { WriteUnderflowError } from "./errors/index.js"
 
 /**
  * A writable binary data type

@@ -1,5 +1,5 @@
-export * from "./empty.js"
-export * from "./errors.js"
-export * from "./opaque.js"
-export * from "./readable.js"
-export * from "./writable.js"
+export * from "./empty/index.js"
+export * from "./opaque/index.js"
+export * from "./readable/index.js"
+export * from "./writable/index.js"
+

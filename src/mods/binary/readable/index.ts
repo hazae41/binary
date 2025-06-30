@@ -1,5 +1,7 @@
+export * from "./errors/index.js";
+
 import { Cursor } from "@hazae41/cursor";
-import { ReadUnderflowError } from "./errors.js";
+import { ReadUnderflowError } from "./errors/index.js";
 
 /**
  * A readable binary data type
