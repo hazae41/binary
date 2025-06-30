@@ -21,8 +21,8 @@
     "test": "node ./dist/test/index.test.mjs"
   },
   "dependencies": {
-    "@hazae41/cursor": "^2.0.1",
-    "@hazae41/uncopy": "^1.0.2"
+    "@hazae41/cursor": "^2.0.3",
+    "@hazae41/uncopy": "^1.0.4"
   },
   "devDependencies": {
     "@hazae41/phobos": "^1.0.10",

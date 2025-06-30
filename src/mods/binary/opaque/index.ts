@@ -1,117 +1,87 @@
 import { Cursor } from "@hazae41/cursor";
 import { Copiable } from "@hazae41/uncopy";
+import { Uint8Array } from "libs/bytes/index.js";
 import { Readable } from "mods/binary/readable/index.js";
 import { Writable } from "../writable/index.js";
 
-export class Opaque<T extends Uint8Array = Uint8Array> {
-
-  /**
-   * A binary data type that just holds bytes
-   * @param value 
-   */
-  constructor(
-    readonly value: Copiable
-  ) { }
-
-  /**
-   * View bytes into a new Opaque
-   * @param bytes 
-   * @returns 
-   */
-  static new<T extends Uint8Array>(bytes: T) {
-    return new Opaque(bytes)
-  }
-
-  /**
-   * Copy bytes into a new Opaque
-   * @param bytes 
-   * @returns 
-   */
-  static from(bytes: Uint8Array) {
-    return new Opaque(new Uint8Array(bytes))
-  }
-
-  sizeOrThrow() {
-    return this.value.length
-  }
-
-  writeOrThrow(cursor: Cursor) {
-    cursor.writeOrThrow(this.value)
-  }
-
-  /**
-   * Transform this opaque into a binary data type
-   * @param readable 
-   * @returns 
-   */
-  readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
-    return Readable.readFromBytesOrThrow(readable, this.value)
-  }
-
-  /**
-   * Create an opaque from a binary data type
-   * @param writable 
-   * @returns 
-   */
-  static writeFromOrThrow(writable: Writable): Opaque {
-    return new Opaque(Writable.writeToBytesOrThrow(writable))
-  }
-
-}
+export type Opaque<N extends number = number> =
+  | Opaque.Copied<N>
+  | Opaque.Uncopied<N>
 
 export namespace Opaque {
 
-  /**
-   * Read an opaque by viewing bytes
-   */
-  export namespace Uncopied {
+  export function writeFromOrThrow(writable: Writable): Opaque {
+    if (writable instanceof Opaque.Uncopied)
+      return writable
+    if (writable instanceof Opaque.Copied)
+      return writable
+    return new Copied(Writable.writeToBytesOrThrow(writable))
+  }
 
+  export class Copied<N extends number = number> implements Copiable<N> {
 
-    /**
-     * Unsafe zero-copy read remaining bytes from cursor
-     * @param cursor 
-     * @returns 
-     */
-    export function readOrThrow(cursor: Cursor) {
-      return new Opaque(cursor.readOrThrow(cursor.remaining))
+    readonly copied = true
+
+    constructor(
+      readonly bytes: Uint8Array<N>
+    ) { }
+
+    static readOrThrow(cursor: Cursor) {
+      return new Copied(cursor.readOrThrow(cursor.remaining).copy().get())
     }
 
-    /**
-     * Perform unsafe zero-copy conversion to Opaque if already Opaque
-     * @param writable 
-     * @returns 
-     */
-    export function writeFromOrThrow(writable: Writable) {
-      if (writable instanceof Opaque)
-        return writable
-      return Opaque.writeFromOrThrow(writable)
+    get() {
+      return this.bytes
+    }
+
+    copy() {
+      return this
+    }
+
+    sizeOrThrow() {
+      return this.bytes.length
+    }
+
+    writeOrThrow(cursor: Cursor) {
+      cursor.writeOrThrow(this.bytes)
+    }
+
+    readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
+      return Readable.readFromBytesOrThrow(readable, this.bytes)
     }
 
   }
 
-  /**
-   * Read an opaque by copying bytes
-   */
-  export namespace Copied {
+  export class Uncopied<N extends number = number> implements Copiable {
 
-    /**
-     * Safe copy read remaining bytes from cursor
-     * @param cursor 
-     * @returns 
-     */
-    export function readOrThrow(cursor: Cursor) {
-      return new Opaque(cursor.readOrThrow(cursor.remaining).copy())
+    readonly copied = false
+
+    constructor(
+      readonly bytes: Uint8Array<N>
+    ) { }
+
+    static readOrThrow(cursor: Cursor) {
+      return new Uncopied(cursor.readOrThrow(cursor.remaining).get())
     }
 
-    /**
-     * Perform safe copy conversion to Opaque if already Opaque
-     * @param writable 
-     * @returns 
-     */
-    export function writeFromOrThrow(writable: Writable) {
-      if (writable instanceof Opaque)
-        return Opaque.from(writable.value)
-      return Opaque.writeFromOrThrow(writable)
+    get() {
+      return this.bytes
+    }
+
+    copy() {
+      return new Copied(new Uint8Array(this.bytes) as Uint8Array<N>)
+    }
+
+    sizeOrThrow() {
+      return this.bytes.length
+    }
+
+    writeOrThrow(cursor: Cursor) {
+      cursor.writeOrThrow(this.bytes)
+    }
+
+    readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
+      return Readable.readFromBytesOrThrow(readable, this.bytes)
     }
 
   }

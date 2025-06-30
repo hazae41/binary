@@ -1,1 +1,1 @@
-export * from "./opaque.test.js";
+export * from "./opaque/index.test.js";
