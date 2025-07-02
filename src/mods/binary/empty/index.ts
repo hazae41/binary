@@ -12,7 +12,15 @@ export class Empty {
     return
   }
 
-  static readOrThrow(cursor: Cursor) {
+  cloneOrThrow() {
+    return this
+  }
+
+}
+
+export namespace Empty {
+
+  export function readOrThrow(cursor: Cursor) {
     return new Empty()
   }
 
