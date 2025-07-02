@@ -21,8 +21,7 @@
     "test": "node ./dist/test/index.test.mjs"
   },
   "dependencies": {
-    "@hazae41/clonable": "^1.0.6",
-    "@hazae41/cursor": "^2.0.4",
+    "@hazae41/cursor": "^2.0.5",
     "@hazae41/lengthed": "^1.0.1"
   },
   "devDependencies": {

@@ -1,20 +1,16 @@
-import { Slice } from "@hazae41/clonable";
 import { Cursor } from "@hazae41/cursor";
+import { Lengthed } from "@hazae41/lengthed";
 import { Readable } from "mods/binary/readable/index.js";
 import { Writable } from "../writable/index.js";
 
 export class Opaque<N extends number = number> {
 
   constructor(
-    readonly slice: Slice<N>
+    readonly bytes: Uint8Array & Lengthed<N>
   ) { }
 
-  get bytes() {
-    return this.slice.bytes
-  }
-
   cloneOrThrow() {
-    return new Opaque(this.slice.cloneOrThrow())
+    return new Opaque(new Uint8Array(this.bytes) as Uint8Array & Lengthed<N>)
   }
 
   sizeOrThrow() {
@@ -39,11 +35,7 @@ export namespace Opaque {
   export function writeFromOrThrow(writable: Writable): Opaque {
     if (writable instanceof Opaque)
       return writable
-
-    const bytes = Writable.writeToBytesOrThrow(writable)
-    const slice = new Slice(bytes)
-
-    return new Opaque(slice)
+    return new Opaque(Writable.writeToBytesOrThrow(writable))
   }
 
 }
