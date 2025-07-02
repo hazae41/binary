@@ -9,10 +9,6 @@ export class Opaque<N extends number = number> {
     readonly bytes: Uint8Array & Lengthed<N>
   ) { }
 
-  cloneOrThrow() {
-    return new Opaque(new Uint8Array(this.bytes) as Uint8Array & Lengthed<N>)
-  }
-
   sizeOrThrow() {
     return this.bytes.length
   }
@@ -23,6 +19,10 @@ export class Opaque<N extends number = number> {
 
   readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
     return Readable.readFromBytesOrThrow(readable, this.bytes)
+  }
+
+  cloneOrThrow() {
+    return new Opaque(new Uint8Array(this.bytes) as Uint8Array & Lengthed<N>)
   }
 
 }
