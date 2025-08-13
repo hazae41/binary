@@ -12,7 +12,7 @@ export interface Readable<Output = unknown> {
    * Read from a cursor
    * @param cursor 
    */
-  readOrThrow(cursor: Cursor): Output
+  readOrThrow(cursor: Cursor<ArrayBuffer>): Output
 
 }
 
@@ -29,7 +29,7 @@ export namespace Readable {
    * @param cursor 
    * @returns 
    */
-  export function readOrRollbackAndThrow<T extends Infer<T>>(readable: T, cursor: Cursor): Output<T> {
+  export function readOrRollbackAndThrow<T extends Infer<T>>(readable: T, cursor: Cursor<ArrayBuffer>): Output<T> {
     const offset = cursor.offset
 
     try {
@@ -46,7 +46,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function readFromBytesOrNull<T extends Infer<T>>(readable: T, bytes: Uint8Array): Output<T> | undefined {
+  export function readFromBytesOrNull<T extends Infer<T>>(readable: T, bytes: Uint8Array<ArrayBuffer>): Output<T> | undefined {
     try {
       const cursor = new Cursor(bytes)
       const output = readable.readOrThrow(cursor)
@@ -68,7 +68,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function readFromBytesOrThrow<T extends Infer<T>>(readable: T, bytes: Uint8Array): Output<T> {
+  export function readFromBytesOrThrow<T extends Infer<T>>(readable: T, bytes: Uint8Array<ArrayBuffer>): Output<T> {
     const cursor = new Cursor(bytes)
     const output = readable.readOrThrow(cursor)
 

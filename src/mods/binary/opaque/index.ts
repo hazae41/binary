@@ -6,7 +6,7 @@ import { Writable } from "../writable/index.js";
 export class Opaque<N extends number = number> {
 
   constructor(
-    readonly bytes: Uint8Array & Lengthed<N>
+    readonly bytes: Uint8Array<ArrayBuffer> & Lengthed<N>
   ) { }
 
   sizeOrThrow() {
@@ -18,7 +18,7 @@ export class Opaque<N extends number = number> {
   }
 
   cloneOrThrow() {
-    return new Opaque(new Uint8Array(this.bytes) as Uint8Array & Lengthed<N>)
+    return new Opaque(new Uint8Array(this.bytes) as Uint8Array<ArrayBuffer> & Lengthed<N>)
   }
 
   readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
@@ -28,7 +28,7 @@ export class Opaque<N extends number = number> {
 }
 export namespace Opaque {
 
-  export function readOrThrow(cursor: Cursor) {
+  export function readOrThrow(cursor: Cursor<ArrayBuffer>) {
     return new Opaque(cursor.readOrThrow(cursor.remaining))
   }
 
