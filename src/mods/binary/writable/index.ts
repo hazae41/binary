@@ -17,7 +17,7 @@ export interface Writable {
    * Write to a cursor
    * @param cursor 
    */
-  writeOrThrow(cursor: Cursor<ArrayBuffer>): void
+  writeOrThrow(cursor: Cursor): void
 
 }
 

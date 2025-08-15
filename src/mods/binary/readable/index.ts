@@ -1,6 +1,7 @@
 export * from "./errors/index.js";
 
 import { Cursor } from "@hazae41/cursor";
+import { BytesLike } from "libs/bytes/index.js";
 import { ReadUnderflowError } from "./errors/index.js";
 
 /**
@@ -12,7 +13,7 @@ export interface Readable<Output = unknown> {
    * Read from a cursor
    * @param cursor 
    */
-  readOrThrow(cursor: Cursor<ArrayBuffer>): Output
+  readOrThrow(cursor: Cursor): Output
 
 }
 
@@ -46,7 +47,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function readFromBytesOrNull<T extends Infer<T>>(readable: T, bytes: Uint8Array<ArrayBuffer>): Output<T> | undefined {
+  export function readFromBytesOrNull<T extends Infer<T>>(readable: T, bytes: BytesLike): Output<T> | undefined {
     try {
       const cursor = new Cursor(bytes)
       const output = readable.readOrThrow(cursor)
@@ -68,7 +69,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function readFromBytesOrThrow<T extends Infer<T>>(readable: T, bytes: Uint8Array<ArrayBuffer>): Output<T> {
+  export function readFromBytesOrThrow<T extends Infer<T>>(readable: T, bytes: BytesLike): Output<T> {
     const cursor = new Cursor(bytes)
     const output = readable.readOrThrow(cursor)
 

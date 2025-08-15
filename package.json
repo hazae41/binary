@@ -21,14 +21,14 @@
     "test": "node ./dist/test/index.test.mjs"
   },
   "dependencies": {
-    "@hazae41/cursor": "^2.0.6",
+    "@hazae41/cursor": "^2.0.7",
     "@hazae41/lengthed": "^1.0.1"
   },
   "devDependencies": {
     "@hazae41/phobos": "^1.0.10",
     "@hazae41/rimraf": "^1.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
-    "@types/node": "^24.2.1",
+    "@types/node": "^24.3.0",
     "rollup": "^4.46.2",
     "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-node-externals": "^8.0.1",
