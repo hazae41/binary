@@ -1,12 +1,11 @@
 import { Cursor } from "@hazae41/cursor";
-import { Bytes } from "libs/bytes/index.js";
 import { Readable } from "mods/binary/readable/index.js";
 import { Writable } from "../writable/index.js";
 
-export class Opaque<T extends ArrayBufferLike = ArrayBufferLike> {
+export class Opaque<T extends Uint8Array = Uint8Array> {
 
   constructor(
-    readonly bytes: Uint8Array<T>
+    readonly bytes: T
   ) { }
 
   sizeOrThrow() {
@@ -18,10 +17,10 @@ export class Opaque<T extends ArrayBufferLike = ArrayBufferLike> {
   }
 
   cloneOrThrow() {
-    return new Opaque(Bytes.copy(this.bytes))
+    return new Opaque(new Uint8Array(this.bytes))
   }
 
-  readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
+  readIntoOrThrow<R extends Readable.Infer<R>>(readable: R): Readable.Output<R> {
     return Readable.readFromBytesOrThrow(readable, this.bytes)
   }
 
