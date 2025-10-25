@@ -1,5 +1,5 @@
+import type { Nullable } from "@/libs/nullable/mod.ts";
 import { Cursor } from "@hazae41/cursor";
-import { Nullable } from "libs/nullable/mod.js";
 
 export type ReadError =
   | ReadUnderflowError

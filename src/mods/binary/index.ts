@@ -1,6 +1,6 @@
-export * from "./clonable/index.js"
-export * from "./empty/index.js"
-export * from "./readable/index.js"
-export * from "./unknown/index.js"
-export * from "./writable/index.js"
+export * from "./clonable/index.ts"
+export * from "./empty/index.ts"
+export * from "./readable/index.ts"
+export * from "./unknown/index.ts"
+export * from "./writable/index.ts"
 

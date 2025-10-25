@@ -1,4 +1,4 @@
-import { Cursor } from "@hazae41/cursor";
+import type { Cursor } from "@hazae41/cursor";
 
 export class Empty {
 
@@ -8,6 +8,7 @@ export class Empty {
     return 0
   }
 
+  // deno-lint-ignore no-unused-vars
   writeOrThrow(cursor: Cursor) {
     return
   }

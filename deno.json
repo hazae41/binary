@@ -1,0 +1,20 @@
+{
+  "name": "@hazae41/binary",
+  "version": "3.0.1",
+  "imports": {
+    "@/": "./src/",
+    "@hazae41/cursor": "jsr:@hazae41/cursor@^2.1.1",
+    "@hazae41/phobos": "jsr:@hazae41/phobos@^2.0.13",
+    "@hazae41/tscousin": "jsr:@hazae41/tscousin@^1.0.28"
+  },
+  "exports": {
+    ".": "./src/mod.ts"
+  },
+  "lint": {
+    "rules": {
+      "exclude": [
+        "no-namespace"
+      ]
+    }
+  }
+}

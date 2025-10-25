@@ -1,7 +1,9 @@
+// deno-lint-ignore-file no-unused-vars require-await
 import { assert, test } from "@hazae41/phobos";
+import { Buffer } from "node:buffer";
 import { relative, resolve } from "node:path";
-import { Readable } from "../readable/index.js";
-import { Unknown } from "./index.js";
+import { Readable } from "../readable/index.ts";
+import { Unknown } from "./index.ts";
 
 function equals(a: Uint8Array, b: Uint8Array) {
   return Buffer.from(a).equals(Buffer.from(b))

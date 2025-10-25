@@ -1,6 +1,6 @@
-import { Cursor } from "@hazae41/cursor";
-import { Readable } from "mods/binary/readable/index.js";
-import { Writable } from "../writable/index.js";
+import { Readable } from "@/mods/binary/readable/index.ts";
+import { Writable } from "@/mods/binary/writable/index.ts";
+import type { Cursor } from "@hazae41/cursor";
 
 export class Unknown<T extends Uint8Array = Uint8Array> {
 

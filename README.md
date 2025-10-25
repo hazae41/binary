@@ -3,10 +3,14 @@
 </div>
 
 ```bash
-npm i @hazae41/binary
+npm install @hazae41/binary
 ```
 
-[**Node Package 📦**](https://www.npmjs.com/package/@hazae41/binary)
+```bash
+deno install jsr:@hazae41/binary
+```
+
+[**📦 NPM**](https://www.npmjs.com/package/@hazae41/binary) • [**📦 JSR**](https://jsr.io/@hazae41/binary)
 
 ## Features
 

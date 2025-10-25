@@ -1,2 +1,2 @@
-export * from "./binary/index.js";
+export * from "./binary/index.ts";
 
