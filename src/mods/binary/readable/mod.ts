@@ -7,13 +7,13 @@ export type ReadError =
 
 export class ReadUnknownError extends Error {
   readonly #class = ReadUnknownError
-  readonly name = this.#class.name
+  readonly name: string = this.#class.name
 
   constructor(options: ErrorOptions) {
     super(`Could not read`, options)
   }
 
-  static from(cause: unknown) {
+  static from(cause: unknown): ReadUnknownError {
     return new ReadUnknownError({ cause })
   }
 
@@ -21,7 +21,7 @@ export class ReadUnknownError extends Error {
 
 export class ReadUnderflowError extends Error {
   readonly #class = ReadUnderflowError
-  readonly name = this.#class.name
+  readonly name: string = this.#class.name
 
   constructor(
     readonly cursorOffset: number,
@@ -30,7 +30,7 @@ export class ReadUnderflowError extends Error {
     super(`Cursor has ${cursorLength - cursorOffset} remaining bytes after read`)
   }
 
-  static from(cursor: Cursor) {
+  static from(cursor: Cursor): ReadUnderflowError {
     return new ReadUnderflowError(cursor.offset, cursor.length)
   }
 

@@ -7,13 +7,13 @@ export type WriteError =
 
 export class SizeUnknownError extends Error {
   readonly #class = SizeUnknownError
-  readonly name = this.#class.name
+  readonly name: string = this.#class.name
 
   constructor(options: ErrorOptions) {
     super(`Could not size`, options)
   }
 
-  static from(cause: unknown) {
+  static from(cause: unknown): SizeUnknownError {
     return new SizeUnknownError({ cause })
   }
 
@@ -21,13 +21,13 @@ export class SizeUnknownError extends Error {
 
 export class WriteUnknownError extends Error {
   readonly #class = WriteUnderflowError
-  readonly name = this.#class.name
+  readonly name: string = this.#class.name
 
   constructor(options: ErrorOptions) {
     super(`Could not write`, options)
   }
 
-  static from(cause: unknown) {
+  static from(cause: unknown): WriteUnknownError {
     return new WriteUnknownError({ cause })
   }
 
@@ -35,7 +35,7 @@ export class WriteUnknownError extends Error {
 
 export class WriteUnderflowError extends Error {
   readonly #class = WriteUnderflowError
-  readonly name = this.#class.name
+  readonly name: string = this.#class.name
 
   constructor(
     readonly cursorOffset: number,
@@ -44,7 +44,7 @@ export class WriteUnderflowError extends Error {
     super(`Cursor has ${cursorLength - cursorOffset} remaining bytes after write`)
   }
 
-  static from(cursor: Cursor) {
+  static from(cursor: Cursor): WriteUnderflowError {
     return new WriteUnderflowError(cursor.offset, cursor.length)
   }
 
@@ -76,7 +76,7 @@ export namespace Writable {
    * @param writable 
    * @returns 
    */
-  export function writeToBytesOrThrow(writable: Writable) {
+  export function writeToBytesOrThrow(writable: Writable): Uint8Array<ArrayBuffer> {
     const size = writable.sizeOrThrow()
 
     const bytes = new Uint8Array(size)

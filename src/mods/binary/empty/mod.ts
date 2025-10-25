@@ -4,7 +4,7 @@ export class Empty {
 
   constructor() { }
 
-  sizeOrThrow() {
+  sizeOrThrow(): 0 {
     return 0
   }
 
@@ -13,7 +13,7 @@ export class Empty {
     return
   }
 
-  cloneOrThrow() {
+  cloneOrThrow(): this {
     return this
   }
 
@@ -21,7 +21,7 @@ export class Empty {
 
 export namespace Empty {
 
-  export function readOrThrow(cursor: Cursor) {
+  export function readOrThrow(cursor: Cursor): Empty {
     return new Empty()
   }
 

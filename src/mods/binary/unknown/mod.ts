@@ -1,5 +1,5 @@
-import { Readable } from "@/mods/binary/readable/index.ts";
-import { Writable } from "@/mods/binary/writable/index.ts";
+import { Readable } from "@/mods/binary/readable/mod.ts";
+import { Writable } from "@/mods/binary/writable/mod.ts";
 import type { Cursor } from "@hazae41/cursor";
 
 export class Unknown<T extends Uint8Array = Uint8Array> {
@@ -8,7 +8,7 @@ export class Unknown<T extends Uint8Array = Uint8Array> {
     readonly bytes: T
   ) { }
 
-  sizeOrThrow() {
+  sizeOrThrow(): number {
     return this.bytes.length
   }
 
@@ -16,7 +16,7 @@ export class Unknown<T extends Uint8Array = Uint8Array> {
     cursor.writeOrThrow(this.bytes)
   }
 
-  cloneOrThrow() {
+  cloneOrThrow(): Unknown<Uint8Array<ArrayBuffer>> {
     return new Unknown(new Uint8Array(this.bytes))
   }
 
@@ -28,7 +28,7 @@ export class Unknown<T extends Uint8Array = Uint8Array> {
 
 export namespace Unknown {
 
-  export function readOrThrow(cursor: Cursor) {
+  export function readOrThrow(cursor: Cursor): Unknown<Uint8Array> {
     return new Unknown(cursor.readOrThrow(cursor.remaining))
   }
 

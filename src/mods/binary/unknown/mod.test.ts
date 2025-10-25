@@ -2,8 +2,8 @@
 import { assert, test } from "@hazae41/phobos";
 import { Buffer } from "node:buffer";
 import { relative, resolve } from "node:path";
-import { Readable } from "../readable/index.ts";
-import { Unknown } from "./index.ts";
+import { Readable } from "../readable/mod.ts";
+import { Unknown } from "./mod.ts";
 
 function equals(a: Uint8Array, b: Uint8Array) {
   return Buffer.from(a).equals(Buffer.from(b))
