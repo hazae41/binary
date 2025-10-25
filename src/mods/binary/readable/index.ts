@@ -1,7 +1,40 @@
-export * from "./errors/index.js";
-
 import { Cursor } from "@hazae41/cursor";
-import { ReadUnderflowError } from "./errors/index.js";
+import { Nullable } from "libs/nullable/mod.js";
+
+export type ReadError =
+  | ReadUnderflowError
+  | ReadUnknownError
+
+export class ReadUnknownError extends Error {
+  readonly #class = ReadUnknownError
+  readonly name = this.#class.name
+
+  constructor(options: ErrorOptions) {
+    super(`Could not read`, options)
+  }
+
+  static from(cause: unknown) {
+    return new ReadUnknownError({ cause })
+  }
+
+}
+
+export class ReadUnderflowError extends Error {
+  readonly #class = ReadUnderflowError
+  readonly name = this.#class.name
+
+  constructor(
+    readonly cursorOffset: number,
+    readonly cursorLength: number
+  ) {
+    super(`Cursor has ${cursorLength - cursorOffset} remaining bytes after read`)
+  }
+
+  static from(cursor: Cursor) {
+    return new ReadUnderflowError(cursor.offset, cursor.length)
+  }
+
+}
 
 /**
  * A readable binary data type
@@ -18,8 +51,6 @@ export interface Readable<Output = unknown> {
 
 export namespace Readable {
 
-  export type Infer<T extends Readable> = Readable<Readable.Output<T>>
-
   export type Output<T extends Readable> = T extends Readable<infer O> ? O : never
 
   /**
@@ -29,7 +60,7 @@ export namespace Readable {
    * @param cursor 
    * @returns 
    */
-  export function readOrRollbackAndThrow<T extends Infer<T>>(readable: T, cursor: Cursor): Output<T> {
+  export function readOrRollbackAndThrow<T>(readable: Readable<T>, cursor: Cursor): T {
     const offset = cursor.offset
 
     try {
@@ -46,7 +77,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function readFromBytesOrNull<T extends Infer<T>>(readable: T, bytes: Uint8Array): Output<T> | undefined {
+  export function readFromBytesOrNull<T>(readable: Readable<T>, bytes: Uint8Array): Nullable<T> {
     try {
       const cursor = new Cursor(bytes)
       const output = readable.readOrThrow(cursor)
@@ -56,7 +87,7 @@ export namespace Readable {
 
       return output
     } catch (e: unknown) {
-      return undefined
+      return
     }
   }
 
@@ -68,7 +99,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function readFromBytesOrThrow<T extends Infer<T>>(readable: T, bytes: Uint8Array): Output<T> {
+  export function readFromBytesOrThrow<T>(readable: Readable<T>, bytes: Uint8Array): T {
     const cursor = new Cursor(bytes)
     const output = readable.readOrThrow(cursor)
 

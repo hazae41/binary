@@ -1,11 +1,11 @@
 /**
  * A clonable binary data type
  */
-export interface Clonable {
+export interface Clonable<T> {
 
   /**
    * Deep clone this object
    */
-  cloneOrThrow(): this
+  cloneOrThrow(): T
 
 }
