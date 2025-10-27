@@ -51,7 +51,9 @@ export interface Readable<Output = unknown> {
 
 export namespace Readable {
 
-  export type Output<T extends Readable> = T extends Readable<infer O> ? O : never
+  export type Infer<Self, Output = unknown> = Readable<Output & Readable.Output<Self>>
+
+  export type Output<Self> = Self extends Readable<infer Output> ? Output : never
 
   /**
    * Call readOrThrow() but rollback the cursor on error
@@ -60,7 +62,7 @@ export namespace Readable {
    * @param cursor 
    * @returns 
    */
-  export function readOrRollbackAndThrow<T>(readable: Readable<T>, cursor: Cursor): T {
+  export function readOrRollbackAndThrow<T extends Readable.Infer<T>>(readable: T, cursor: Cursor): Readable.Output<T> {
     const offset = cursor.offset
 
     try {
@@ -77,7 +79,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function readFromBytesOrNull<T>(readable: Readable<T>, bytes: Uint8Array): Nullable<T> {
+  export function readFromBytesOrNull<T extends Readable.Infer<T>>(readable: T, bytes: Uint8Array): Nullable<Readable.Output<T>> {
     try {
       const cursor = new Cursor(bytes)
       const output = readable.readOrThrow(cursor)
@@ -99,7 +101,7 @@ export namespace Readable {
    * @param bytes 
    * @returns 
    */
-  export function readFromBytesOrThrow<T>(readable: Readable<T>, bytes: Uint8Array): T {
+  export function readFromBytesOrThrow<T extends Readable.Infer<T>>(readable: T, bytes: Uint8Array): Readable.Output<T> {
     const cursor = new Cursor(bytes)
     const output = readable.readOrThrow(cursor)
 

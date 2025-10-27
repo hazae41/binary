@@ -12,6 +12,8 @@ export interface Clonable<Output = unknown> {
 
 export namespace Clonable {
 
-  export type Output<T extends Clonable> = T extends Clonable<infer O> ? O : never
+  export type Infer<Self, Output = unknown> = Clonable<Output & Clonable.Output<Self>>
+
+  export type Output<Self> = Self extends Clonable<infer Output> ? Output : never
 
 }

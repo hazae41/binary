@@ -20,7 +20,7 @@ export class Unknown<T extends Uint8Array = Uint8Array> {
     return new Unknown(new Uint8Array(this.bytes))
   }
 
-  readIntoOrThrow<U>(readable: Readable<U>): U {
+  readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
     return Readable.readFromBytesOrThrow(readable, this.bytes)
   }
 
