@@ -1,14 +1,15 @@
+import type { Lengthed } from "@/libs/lengthed/mod.ts";
 import { Readable } from "@/mods/binary/readable/mod.ts";
 import { Writable } from "@/mods/binary/writable/mod.ts";
 import type { Cursor } from "@hazae41/cursor";
 
-export class Unknown<T extends Uint8Array = Uint8Array> {
+export class Unknown<T extends ArrayBufferLike = ArrayBufferLike, N extends number = number> {
 
   constructor(
-    readonly bytes: T
+    readonly bytes: Uint8Array<T> & Lengthed<N>,
   ) { }
 
-  sizeOrThrow(): number {
+  sizeOrThrow(): N {
     return this.bytes.length
   }
 
@@ -16,8 +17,8 @@ export class Unknown<T extends Uint8Array = Uint8Array> {
     cursor.writeOrThrow(this.bytes)
   }
 
-  cloneOrThrow(): Unknown<Uint8Array<ArrayBuffer>> {
-    return new Unknown(new Uint8Array(this.bytes))
+  cloneOrThrow(): Unknown<ArrayBuffer, N> {
+    return new Unknown(new Uint8Array(this.bytes) as Uint8Array<ArrayBuffer> & Lengthed<N>)
   }
 
   readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
@@ -28,11 +29,11 @@ export class Unknown<T extends Uint8Array = Uint8Array> {
 
 export namespace Unknown {
 
-  export function readOrThrow(cursor: Cursor): Unknown<Uint8Array> {
+  export function readOrThrow<T extends ArrayBufferLike>(cursor: Cursor<T>): Unknown<T> {
     return new Unknown(cursor.readOrThrow(cursor.remaining))
   }
 
-  export function writeFromOrThrow(writable: Writable): Unknown {
+  export function writeFromOrThrow(writable: Writable): Unknown<ArrayBuffer> {
     if (writable instanceof Unknown)
       return writable
     return new Unknown(Writable.writeToBytesOrThrow(writable))
