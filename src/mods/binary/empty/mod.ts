@@ -1,19 +1,20 @@
+// deno-lint-ignore-file no-namespace no-unused-vars
+
 import type { Cursor } from "@hazae41/cursor";
 
 export class Empty {
 
   constructor() { }
 
-  sizeOrThrow(): 0 {
+  size(): 0 {
     return 0
   }
 
-  // deno-lint-ignore no-unused-vars
-  writeOrThrow(cursor: Cursor) {
+  write(cursor: Cursor) {
     return
   }
 
-  cloneOrThrow(): this {
+  clone(): this {
     return this
   }
 
@@ -21,7 +22,7 @@ export class Empty {
 
 export namespace Empty {
 
-  export function readOrThrow(cursor: Cursor): Empty {
+  export function read(cursor: Cursor): Empty {
     return new Empty()
   }
 

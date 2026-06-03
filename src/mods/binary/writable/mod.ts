@@ -1,37 +1,6 @@
+// deno-lint-ignore-file no-namespace
+
 import { Cursor } from "@hazae41/cursor"
-
-export type WriteError =
-  | SizeUnknownError
-  | WriteUnderflowError
-  | WriteUnknownError
-
-export class SizeUnknownError extends Error {
-  readonly #class = SizeUnknownError
-  readonly name: string = this.#class.name
-
-  constructor(options: ErrorOptions) {
-    super(`Could not size`, options)
-  }
-
-  static from(cause: unknown): SizeUnknownError {
-    return new SizeUnknownError({ cause })
-  }
-
-}
-
-export class WriteUnknownError extends Error {
-  readonly #class = WriteUnderflowError
-  readonly name: string = this.#class.name
-
-  constructor(options: ErrorOptions) {
-    super(`Could not write`, options)
-  }
-
-  static from(cause: unknown): WriteUnknownError {
-    return new WriteUnknownError({ cause })
-  }
-
-}
 
 export class WriteUnderflowError extends Error {
   readonly #class = WriteUnderflowError
@@ -58,31 +27,31 @@ export interface Writable {
   /**
    * Compute the amount of bytes to allocate
    */
-  sizeOrThrow(): number
+  size(): number
 
   /**
    * Write to a cursor
    * @param cursor 
    */
-  writeOrThrow(cursor: Cursor): void
+  write(cursor: Cursor): void
 
 }
 
 export namespace Writable {
 
   /**
-   * Call writeOrThrow() on sizeOrThrow()-sized bytes and check for underflow
-   * @throws whatever sizeOrThrow() or writeOrThrow() throws
+   * Call write() on size()-sized bytes and check for underflow
+   * @throws whatever size() or write() throws
    * @param writable 
    * @returns 
    */
-  export function writeToBytesOrThrow(writable: Writable): Uint8Array<ArrayBuffer> {
-    const size = writable.sizeOrThrow()
+  export function writeToBytes(writable: Writable): Uint8Array<ArrayBuffer> {
+    const size = writable.size()
 
     const bytes = new Uint8Array(size)
     const cursor = new Cursor(bytes)
 
-    writable.writeOrThrow(cursor)
+    writable.write(cursor)
 
     if (cursor.remaining)
       throw WriteUnderflowError.from(cursor)

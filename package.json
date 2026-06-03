@@ -2,14 +2,12 @@
   "type": "module",
   "name": "@hazae41/binary",
   "version": "2.0.2",
-  "description": "Zero-copy binary data types",
+  "description": "Zero-copy binary data types for the web",
   "repository": "github:hazae41/binary",
   "author": "hazae41",
   "license": "MIT",
   "scripts": {
     "examine": "deno lint ./src && deno check ./src && deno test ./src",
-    "version": "deno -RW ./x.vsync.ts && git add deno.json",
-    "prepare": "deno -RW ./x.dsync.ts && deno install",
     "prepack": "rm -rf ./out && tsc && tscousin"
   },
   "files": [
@@ -22,12 +20,14 @@
     }
   },
   "dependencies": {
-    "@hazae41/cursor": "^2.1.2"
+    "@hazae41/cursor": "^2.2.0"
   },
   "devDependencies": {
     "@hazae41/phobos": "^2.0.16",
     "@hazae41/tscousin": "^1.0.28",
-    "typescript": "^5.9.3"
+    "@types/node": "^25.9.1",
+    "deno": "^2.8.1",
+    "typescript": "^6.0.3"
   },
   "keywords": [
     "binary",

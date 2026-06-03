@@ -1,42 +1,31 @@
-import type { Lengthed } from "@/libs/lengthed/mod.ts";
-import { Readable } from "@/mods/binary/readable/mod.ts";
-import { Writable } from "@/mods/binary/writable/mod.ts";
+// deno-lint-ignore-file no-namespace
+
 import type { Cursor } from "@hazae41/cursor";
 
-export class Unknown<T extends ArrayBufferLike = ArrayBufferLike, N extends number = number> {
+export class Unknown<T extends ArrayBufferLike = ArrayBufferLike> {
 
   constructor(
-    readonly bytes: Uint8Array<T> & Lengthed<N>,
+    readonly bytes: Uint8Array<T>
   ) { }
 
-  sizeOrThrow(): N {
+  size(): number {
     return this.bytes.length
   }
 
-  writeOrThrow(cursor: Cursor) {
-    cursor.writeOrThrow(this.bytes)
+  write(cursor: Cursor) {
+    cursor.write(this.bytes)
   }
 
-  cloneOrThrow(): Unknown<ArrayBuffer, N> {
-    return new Unknown(new Uint8Array(this.bytes) as Uint8Array<ArrayBuffer> & Lengthed<N>)
-  }
-
-  readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
-    return Readable.readFromBytesOrThrow(readable, this.bytes)
+  clone(): Unknown<ArrayBuffer> {
+    return new Unknown(new Uint8Array(this.bytes))
   }
 
 }
 
 export namespace Unknown {
 
-  export function readOrThrow<T extends ArrayBufferLike>(cursor: Cursor<T>): Unknown<T> {
-    return new Unknown(cursor.readOrThrow(cursor.remaining))
-  }
-
-  export function writeFromOrThrow(writable: Writable): Unknown<ArrayBuffer> {
-    if (writable instanceof Unknown)
-      return writable
-    return new Unknown(Writable.writeToBytesOrThrow(writable))
+  export function read<T extends ArrayBufferLike>(cursor: Cursor<T>): Unknown<T> {
+    return new Unknown(cursor.read(cursor.remaining))
   }
 
 }

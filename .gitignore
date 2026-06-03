@@ -2,8 +2,8 @@
 
 /node_modules
 
-/vendor
-
 /out
 
 *.local
+
+/local
