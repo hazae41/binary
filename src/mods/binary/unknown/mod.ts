@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-namespace
 
+import { Readable } from "@/mods/binary/readable/mod.ts";
 import type { Cursor } from "@hazae41/cursor";
 
 export class Unknown<T extends ArrayBufferLike = ArrayBufferLike> {
@@ -18,6 +19,10 @@ export class Unknown<T extends ArrayBufferLike = ArrayBufferLike> {
 
   clone(): Unknown<ArrayBuffer> {
     return new Unknown(new Uint8Array(this.bytes))
+  }
+
+  into<T>(readable: Readable<T>) {
+    return Readable.readFromBytes(readable, this.bytes)
   }
 
 }
